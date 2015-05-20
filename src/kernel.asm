@@ -6,7 +6,7 @@
 %include "imprimir.mac"
 
 global start
-
+extern GDT_DESC
 
 ;; Saltear seccion de datos
 jmp start
@@ -40,17 +40,32 @@ start:
     ; Imprimir mensaje de bienvenida
     imprimir_texto_mr iniciando_mr_msg, iniciando_mr_len, 0x07, 0, 0
 
-
+    xchg bx, bx
     ; Habilitar A20
-
+    call habilitar_A20  
+   
     ; Cargar la GDT
+		lgdt [GDT_DESC]      ; cargo la estructura que esta en gdt.c
 
+    xchg bx, bx
     ; Setear el bit PE del registro CR0
-
+    mov eax, cr0
+		or eax, 1
+		mov cr0, eax
     ; Saltar a modo protegido
 
+		jmp 0x40:modoprotegido
     ; Establecer selectores de segmentos
+modoprotegido:
+    xor eax, eax
+		mov ax, 1001000b
 
+		mov ds, ax
+		mov es, ax
+		mov gs, ax
+    
+		mov ax, 1100000b
+    mov fs, ax
     ; Establecer la base de la pila
 
     ; Imprimir mensaje de bienvenida
