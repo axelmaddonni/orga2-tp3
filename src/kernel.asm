@@ -7,7 +7,7 @@
 
 global start
 extern GDT_DESC
-
+extern print
 ;; Saltear seccion de datos
 jmp start
 
@@ -45,31 +45,43 @@ start:
     call habilitar_A20  
    
     ; Cargar la GDT
-		lgdt [GDT_DESC]      ; cargo la estructura que esta en gdt.c
+	lgdt [GDT_DESC]      ; cargo la estructura que esta en gdt.c
 
     xchg bx, bx
     ; Setear el bit PE del registro CR0
     mov eax, cr0
-		or eax, 1
-		mov cr0, eax
+	or eax, 1
+	mov cr0, eax
     ; Saltar a modo protegido
 
-		jmp 0x40:modoprotegido
+	jmp 0x40:modoprotegido
     ; Establecer selectores de segmentos
+
+
+BITS 32
 modoprotegido:
     xor eax, eax
-		mov ax, 1001000b
+	mov ax,  1001000b
 
-		mov ds, ax
-		mov es, ax
-		mov gs, ax
+	mov ds, ax
+	mov es, ax
+	mov gs, ax
     
-		mov ax, 1100000b
+	mov ax, 1100000b
     mov fs, ax
+    
     ; Establecer la base de la pila
-
+	mov ebp, 0x27000
+	mov esp, 0x27000
+	
+		
     ; Imprimir mensaje de bienvenida
-
+    push dword 0xffff   ; fruta
+    push dword 0
+    push dword 0
+    push MENSAJE_MODO_PROTEGIDO
+    
+    call print
     ; Inicializar el juego
 
     ; Inicializar pantalla
@@ -107,7 +119,8 @@ modoprotegido:
     mov edx, 0xFFFF
     jmp $
     jmp $
-
+	
 ;; -------------------------------------------------------------------------- ;;
 
 %include "a20.asm"
+MENSAJE_MODO_PROTEGIDO: db 'Corriendo en modo protegido...', 10, 0 
