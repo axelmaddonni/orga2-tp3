@@ -8,6 +8,10 @@
 global start
 extern GDT_DESC
 extern print
+
+extern idt_inicializar
+extern IDT_DESC
+
 ;; Saltear seccion de datos
 jmp start
 
@@ -40,14 +44,12 @@ start:
     ; Imprimir mensaje de bienvenida
     imprimir_texto_mr iniciando_mr_msg, iniciando_mr_len, 0x07, 0, 0
 
-    xchg bx, bx
     ; Habilitar A20
     call habilitar_A20  
    
     ; Cargar la GDT
 	lgdt [GDT_DESC]      ; cargo la estructura que esta en gdt.c
 
-    xchg bx, bx
     ; Setear el bit PE del registro CR0
     mov eax, cr0
 	or eax, 1
@@ -66,6 +68,7 @@ modoprotegido:
 	mov ds, ax
 	mov es, ax
 	mov gs, ax
+	mov ss, ax
     
 	mov ax, 1100000b
     mov fs, ax
@@ -76,11 +79,10 @@ modoprotegido:
 	
 		
     ; Imprimir mensaje de bienvenida
-    push dword 0xffff   ; fruta
-    push dword 0
+    push dword 0x0f0f   ; fruta
+    push dword 2
     push dword 0
     push MENSAJE_MODO_PROTEGIDO
-    
     call print
     ; Inicializar el juego
 
@@ -101,9 +103,18 @@ modoprotegido:
     ; Inicializar el scheduler
 
     ; Inicializar la IDT
+    call idt_inicializar
 
     ; Cargar IDT
+    
+    lidt [IDT_DESC]
+     
+     mov ebx, 0
+     xchg bx, bx
 
+     or eax, 0xffffffff
+     sub eax, 0x0000000
+     
     ; Configurar controlador de interrupciones
 
     ; Cargar tarea inicial
@@ -123,4 +134,4 @@ modoprotegido:
 ;; -------------------------------------------------------------------------- ;;
 
 %include "a20.asm"
-MENSAJE_MODO_PROTEGIDO: db 'Corriendo en modo protegido...', 10, 0 
+MENSAJE_MODO_PROTEGIDO: db 'Corriendo en modo protegido...', 0 

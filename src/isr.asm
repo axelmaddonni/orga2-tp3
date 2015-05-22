@@ -6,6 +6,8 @@
 
 %include "imprimir.mac"
 
+extern print
+
 BITS 32
 
 sched_tarea_offset:     dd 0x00
@@ -26,8 +28,14 @@ extern sched_tarea_actual
 %macro ISR 1
 global _isr%1
 
+	
 _isr%1:
     mov eax, %1
+    push dword 0x0f0f   ; fruta
+    push dword 0
+    push dword 0
+    push MENSAJE_ERROR_%1
+    call print
     jmp $
 
 %endmacro
@@ -41,6 +49,7 @@ _isr%1:
 ;; Rutina de atención de las EXCEPCIONES
 ;; -------------------------------------------------------------------------- ;;
 ISR 0
+ISR 4
 
 ;;
 ;; Rutina de atención del RELOJ
@@ -54,4 +63,7 @@ ISR 0
 ;; Rutinas de atención de las SYSCALLS
 ;; -------------------------------------------------------------------------- ;;
 
+
+MENSAJE_ERROR_0: db 'Interrupcion de division por 0. (Error 0)', 0
+MENSAJE_ERROR_4: db 'Interrupcion de overflow. (Error 4)', 0
 
