@@ -12,6 +12,11 @@ extern print
 extern idt_inicializar
 extern IDT_DESC
 
+;; PAGINACION (EJERCICIO 3)
+extern mmu_inicializar_dir_kernel
+extern mmu_inicializar_tabla_kernel
+%define PAGE_DIRECTORY_CR3 0x00027000
+
 ;; Saltear seccion de datos
 jmp start
 
@@ -89,12 +94,19 @@ modoprotegido:
     ; Inicializar pantalla
 
     ; Inicializar el manejador de memoria
-
+xchg bx, bx
     ; Inicializar el directorio de paginas
-
+    call mmu_inicializar_dir_kernel
+    call mmu_inicializar_tabla_kernel
+     
     ; Cargar directorio de paginas
-
+    mov eax, PAGE_DIRECTORY_CR3
+    mov cr3, eax
+   
     ; Habilitar paginacion
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
 
     ; Inicializar tss
 
@@ -110,7 +122,7 @@ modoprotegido:
     lidt [IDT_DESC]
      
      mov ebx, 0
-     xchg bx, bx
+     
 
      or eax, 0xffffffff
      sub eax, 0x0000000
