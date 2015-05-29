@@ -40,3 +40,34 @@ void mmu_inicializar_tabla_kernel(){
 		tabla_kernel[i] = j;
 	}
 }
+
+void * siguiente_libre;
+
+void * dar_siguiente(){
+	siguiente_libre += 0x1000;
+	return siguiente_libre - 0x1000;
+}
+
+void inicializar_mmu(){
+  siguiente_libre = (void *) PAGE_COUNTER_INIT;
+}
+
+
+void mmu_inicializar_dir_pirata();
+
+
+void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint attrs){
+	uint directorio_offset = (virtual >> 22);
+	(uint *) page_table = *(cr3 + directorio_offset);
+	
+	uint tabla_offset = (virtual >> 12) | 0x0003ff;
+	
+	
+	
+	  
+	
+	
+}
+
+
+

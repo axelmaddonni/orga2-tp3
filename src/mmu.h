@@ -16,6 +16,8 @@
 #define MAPA_BASE_FISICA  0x500000
 #define MAPA_BASE_VIRTUAL 0x800000
 
+#define PAGE_COUNTER_INIT 0x00100000
+
 
 void mmu_inicializar_dir_kernel();
 
