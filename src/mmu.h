@@ -19,9 +19,41 @@
 #define PAGE_COUNTER_INIT 0x00100000
 
 
+// esto no lo dio la catedra
+typedef struct pde_t {
+    unsigned char present:1;
+    unsigned char read_write:1;
+    unsigned char user_supervisor:1;
+    unsigned char page_level_write_through:1;
+    unsigned char page_level_cache_disable:1;
+    unsigned char accessed:1;
+    unsigned char reserved:1;
+    unsigned char page_size:1;
+    unsigned char global:1;
+    unsigned char available_9_11:3;
+    unsigned int  base_address:20;
+} __attribute__((__packed__, aligned (4))) pde;
+
+typedef struct pte_t {
+    unsigned char present:1;
+    unsigned char read_write:1;
+    unsigned char user_supervisor:1;
+    unsigned char page_level_write_through:1;
+    unsigned char page_level_cache_disable:1;
+    unsigned char accessed:1;
+    unsigned char dirty:1;
+    unsigned char page_table_attribute_index:1;
+    unsigned char global:1;
+    unsigned char available_9_11:3;
+    unsigned int  base_address:20;
+} __attribute__((__packed__, aligned (4))) pte;
+//
+
 void mmu_inicializar_dir_kernel();
 
 void mmu_inicializar();
+pte * mmu_inicializar_dir_pirata();
+
 
 
 #endif	/* !__MMU_H__ */

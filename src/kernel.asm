@@ -17,6 +17,10 @@ extern mmu_inicializar_dir_kernel
 extern mmu_inicializar_tabla_kernel
 %define PAGE_DIRECTORY_CR3 0x00027000
 
+;; MAS PAGINACION (EJECICIO 4)
+extern mmu_inicializar_dir_pirata
+extern inicializar_mmu
+
 ;; Saltear seccion de datos
 jmp start
 
@@ -94,7 +98,7 @@ modoprotegido:
     ; Inicializar pantalla
 
     ; Inicializar el manejador de memoria
-xchg bx, bx
+
     ; Inicializar el directorio de paginas
     call mmu_inicializar_dir_kernel
     call mmu_inicializar_tabla_kernel
@@ -108,6 +112,21 @@ xchg bx, bx
     or eax, 0x80000000
     mov cr0, eax
 
+    call inicializar_mmu
+    call mmu_inicializar_dir_pirata
+    xchg bx, bx
+    mov cr3, eax
+   
+
+    ;;;; ESTO SE DEBE BORRAR DE LA  VERSION FINAL
+    push dword 0x0e0e   ; notar que cambia el color
+    push dword 2
+    push dword 0
+    push MENSAJE_MODO_PROTEGIDO
+    call print
+    ;;;;; ES SOLO UN  TEST QUE SUGIEREN
+    
+    
     ; Inicializar tss
 
     ; Inicializar tss de la tarea Idle

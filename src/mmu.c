@@ -52,28 +52,83 @@ void inicializar_mmu(){
   siguiente_libre = (void *) PAGE_COUNTER_INIT;
 }
 
+/******************************************************************/
 
-void mmu_inicializar_dir_pirata();
+
+void mmu_inicializar_tabla_kernel_para_pirata(pde * tabla){
+	
+	uint *tabla_kernel = (uint*)(0x28000);
+	
+	uint i;
+	for(i = 0; i<1024; i++){
+    tabla[i].base_address = i;
+    tabla[i].present = 1;
+    tabla[i].read_write = 0;
+    //tabla[i].user_supervisor = 1;
+    // ^^^^ PREGUNTAR ESTO
+  	tabla_kernel[i] = i;
+	}
+}
 
 
-void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint attrs){
-	// direccion virtual
-  // | directorio  |    tabla    |    offset   |
-  // | 31       22 | 21       12 | 11        0 |
+pte * mmu_inicializar_dir_pirata(){
+  //obtengo la siguiente libre
+  pte * resultado = (pte *) dar_siguiente();
+
+  // lo pongo todo vacio
+	uint i;
+	for(i = 0; i<1024; i++){
+		resultado[i].present = 0;
+	}
+
+  // me armo la tabla del kernel
+  pde * tabla_kernel = dar_siguiente();
+  mmu_inicializar_tabla_kernel_para_pirata(tabla_kernel);
+   
+	
+  resultado[0].base_address = ((uint) tabla_kernel)>>12;
+  resultado[0].read_write = 0;
+  resultado[0].present = 1;
+
+  //FALTA TODO LO DEL CODIGO!!!!
+
+
+  return resultado;
+}
+
+// direccion virtual
+// | directorio  |    tabla    |    offset   |
+// | 31       22 | 21       12 | 11        0 |
   
-  //uint directorio = (virtual >> 22) & 0x3ff;
-  //uint tabla = (virtual >> 12) & 0x3ff;
 
-	//uint * page_table = * (uint **) (cr3 + directorio_offset);
-	
-	//uint tabla_offset = (virtual >> 12) | 0x0003ff;
-	
-	
-	
-	  
-	
+void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar user_supervisor){
+
+  uint directorio = (virtual >> 22) & 0x3ff;
+  uint tabla = (virtual >> 12) & 0x3ff;
+
+  pte * page_table = (pte *) (cr3[directorio].base_address << 12);
+
+  page_table[tabla].user_supervisor = user_supervisor;
+  page_table[tabla].read_write = rw;
+  page_table[tabla].base_address = fisica >> 12;
+  page_table[tabla].present = 1;	
+  
+  tlbflush();
 	
 }
+
+
+void mmu_unmapear_pagina(uint virtual, pde * cr3){
+  uint directorio = (virtual >> 22) & 0x3ff;
+  uint tabla = (virtual >> 12) & 0x3ff;
+
+  pte * page_table = (pte *) (cr3[directorio].base_address << 12);
+  
+  page_table[tabla].present = 0;
+
+  tlbflush();
+}
+
 
 
 
