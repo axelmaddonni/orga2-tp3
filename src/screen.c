@@ -33,6 +33,31 @@ void screen_pintar(uchar c, uchar color, uint fila, uint columna)
     p[fila][columna].a = color;
 }
 
+void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho)
+{
+	int i;
+	int j;
+	for (i = 0; i < ancho; i++){
+		for (j = 0; j < alto; j++){
+		    p[fila + j][columna + i].c = c;
+		    p[fila + j][columna + i].a = color;
+		}
+	}
+}
+
+void screen_inicializar()
+{
+	//limpio la pantalla
+	screen_pintar_rect(0x00, 0x77, 0, 0, 50, 80);
+	//barra negra
+	screen_pintar_rect(0x00, 0x00, 45, 0, 5, 80);
+	//barra roja
+	screen_pintar_rect(0x00, 0xCC, 45, 30 , 5, 10);
+	//barra azul
+	screen_pintar_rect(0x00, 0x99, 45, 40 , 5, 10);
+
+}
+
 uchar screen_valor_actual(uint fila, uint columna)
 {
     return p[fila][columna].c;

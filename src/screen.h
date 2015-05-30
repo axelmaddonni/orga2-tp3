@@ -19,8 +19,8 @@
 #include "defines.h"
 /* Estructura de para acceder a memoria de video */
 typedef struct ca_s {
-    unsigned char c;
-    unsigned char a;
+    unsigned char c; // caracter ascii
+    unsigned char a; // modo de color (  |blink|fondo|fondo|fondo|brillante|caracter|caracter|caracter| )
 } ca;
 
 
@@ -32,17 +32,17 @@ typedef struct jugador_t jugador_t;
 
 int ee_printf(const char *fmt, ...);
 
+void print(const char * text, unsigned int x, unsigned int y, unsigned short attr); //viene hecha
+void print_hex(unsigned int numero, int size, unsigned int x, unsigned int y, unsigned short attr); //viene hecha
+void screen_pintar(unsigned char c, unsigned char color, uint fila, uint columna);  //viene hecha
 
-void screen_pintar(unsigned char c, unsigned char color, uint fila, uint columna);
-void print(const char * text, unsigned int x, unsigned int y, unsigned short attr);
-void print_hex(unsigned int numero, int size, unsigned int x, unsigned int y, unsigned short attr);
 void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho);
 void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int columna, int ancho);
 void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int columna, int alto);
 void screen_inicializar();
 void screen_pintar_puntajes();
 
-void screen_actualizar_reloj_global();
+void screen_actualizar_reloj_global(); //viene hecha
 void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata);
 unsigned char screen_color_jugador(jugador_t *j);
 unsigned char screen_caracter_pirata(unsigned int tipo);

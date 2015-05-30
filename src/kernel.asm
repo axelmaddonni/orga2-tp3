@@ -9,6 +9,7 @@ global start
 extern GDT_DESC
 extern print
 
+extern screen_inicializar
 extern idt_inicializar
 extern IDT_DESC
 
@@ -96,6 +97,7 @@ modoprotegido:
     ; Inicializar el juego
 
     ; Inicializar pantalla
+    call screen_inicializar
 
     ; Inicializar el manejador de memoria
 
@@ -119,11 +121,11 @@ modoprotegido:
    
 
     ;;;; ESTO SE DEBE BORRAR DE LA  VERSION FINAL
-    push dword 0x0e0e   ; notar que cambia el color
-    push dword 2
-    push dword 0
-    push MENSAJE_MODO_PROTEGIDO
-    call print
+    ;push dword 0x0e0e   ; notar que cambia el color
+    ;push dword 2
+    ;push dword 0
+    ;push MENSAJE_MODO_PROTEGIDO
+    ;call print
     ;;;;; ES SOLO UN  TEST QUE SUGIEREN
     
     
@@ -142,7 +144,6 @@ modoprotegido:
      
      mov ebx, 0
      
-
      or eax, 0xffffffff
      sub eax, 0x0000000
      
