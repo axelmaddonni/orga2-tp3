@@ -57,10 +57,16 @@ void mmu_inicializar_dir_pirata();
 
 
 void mmu_mapear_pagina(uint virtual, uint cr3, uint fisica, uint attrs){
-	uint directorio_offset = (virtual >> 22);
-	(uint *) page_table = *(cr3 + directorio_offset);
+	// direccion virtual
+  // | directorio  |    tabla    |    offset   |
+  // | 31       22 | 21       12 | 11        0 |
+  
+  //uint directorio = (virtual >> 22) & 0x3ff;
+  //uint tabla = (virtual >> 12) & 0x3ff;
+
+	//uint * page_table = * (uint **) (cr3 + directorio_offset);
 	
-	uint tabla_offset = (virtual >> 12) | 0x0003ff;
+	//uint tabla_offset = (virtual >> 12) | 0x0003ff;
 	
 	
 	
