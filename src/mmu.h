@@ -47,12 +47,17 @@ typedef struct pte_t {
     unsigned char available_9_11:3;
     unsigned int  base_address:20;
 } __attribute__((__packed__, aligned (4))) pte;
-//
+
+/* Como la estructura "page table entry" y "page directory entry" cada una
+ * miden 4 bytes de tamaño, y van a estar en estructuras alineadas a 4K, 
+ * las alineamos a 4 bytes. En realidad por como hardcodeamos donde empiezan
+ * las tablas no hay problema, pero agregamos redundancia.
+ */
 
 void mmu_inicializar_dir_kernel();
 
 void mmu_inicializar();
-pte * mmu_inicializar_dir_pirata();
+pde * mmu_inicializar_dir_pirata();
 
 
 

@@ -30,7 +30,6 @@ void mmu_inicializar_dir_kernel(){
 }
 
 void mmu_inicializar_tabla_kernel(){
-	
 	uint *tabla_kernel = (uint*)(0x28000);
 	
 	uint i;
@@ -44,6 +43,12 @@ void mmu_inicializar_tabla_kernel(){
 void * siguiente_libre;
 
 void * dar_siguiente(){
+	uint i;
+	
+	for(i = 0; i<1024; i++){
+		((pde *) siguiente_libre)[i].present = 0;
+	}
+	
 	siguiente_libre += 0x1000;
 	return siguiente_libre - 0x1000;
 }
@@ -55,41 +60,33 @@ void inicializar_mmu(){
 /******************************************************************/
 
 
-void mmu_inicializar_tabla_kernel_para_pirata(pde * tabla){
-	
-	uint *tabla_kernel = (uint*)(0x28000);
-	
+void mmu_inicializar_tabla_kernel_para_pirata(pte * tabla){
 	uint i;
 	for(i = 0; i<1024; i++){
-    tabla[i].base_address = i;
-    tabla[i].present = 1;
-    tabla[i].read_write = 0;
-    //tabla[i].user_supervisor = 1;
-    // ^^^^ PREGUNTAR ESTO
-  	tabla_kernel[i] = i;
+      tabla[i].base_address = i;
+      tabla[i].present = 1;
+      tabla[i].read_write = 0;            // ESTO PUEDE SER
+      tabla[i].user_supervisor = 0;       // FRUTA
 	}
 }
 
 
-pte * mmu_inicializar_dir_pirata(){
+pde * mmu_inicializar_dir_pirata(){
   //obtengo la siguiente libre
-  pte * resultado = (pte *) dar_siguiente();
-
-  // lo pongo todo vacio
-	uint i;
-	for(i = 0; i<1024; i++){
-		resultado[i].present = 0;
-	}
-
+  pde * resultado = (pde *) dar_siguiente();
+  // dar_siguiente lo devuelve en 0
+  
   // me armo la tabla del kernel
-  pde * tabla_kernel = dar_siguiente();
+  pte * tabla_kernel = dar_siguiente();
   mmu_inicializar_tabla_kernel_para_pirata(tabla_kernel);
    
 	
   resultado[0].base_address = ((uint) tabla_kernel)>>12;
   resultado[0].read_write = 0;
   resultado[0].present = 1;
-
+  resultado[0].user_supervisor = 0; //supervisor, puede estar mal
+  
+  
   //FALTA TODO LO DEL CODIGO!!!!
 
 
@@ -105,8 +102,19 @@ void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar use
 
   uint directorio = (virtual >> 22) & 0x3ff;
   uint tabla = (virtual >> 12) & 0x3ff;
+  
+  pte * page_table;
 
-  pte * page_table = (pte *) (cr3[directorio].base_address << 12);
+  if(!cr3[directorio].present){
+	  page_table = dar_siguiente();
+	  
+	  cr3[directorio].present = 1;
+	  cr3[directorio].read_write = rw;
+	  cr3[directorio].read_write = user_supervisor;
+	  cr3[directorio].base_address = ((uint) page_table) >> 12;
+  } else{
+      page_table = (pte *) (cr3[directorio].base_address << 12);
+  }
 
   page_table[tabla].user_supervisor = user_supervisor;
   page_table[tabla].read_write = rw;

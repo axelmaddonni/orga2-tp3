@@ -45,11 +45,22 @@ idt_descriptor IDT_DESC = {
 #define IDT_ENTRY(numero)                                                                                        \
     idt[numero].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## numero) & (unsigned int) 0xFFFF);        \
     idt[numero].segsel = (unsigned short) 0x0040;                                                                  \
-    idt[numero].attr = (unsigned short) 0x8e0f;                                                                  \
+    idt[numero].attr = (unsigned short) 0x8e00;                                                                  \
     idt[numero].offset_16_31 = (unsigned short) ((unsigned int)(&_isr ## numero) >> 16 & (unsigned int) 0xFFFF);
 
 
 void idt_inicializar() {
 	IDT_ENTRY(0);
 	IDT_ENTRY(4);
+	
+	//RELOJ
+	IDT_ENTRY(32);
+	//TECLADO
+	IDT_ENTRY(33);
+	//INTERRUPCION
+	IDT_ENTRY(70); 
+	/* por las dudas, 0x46 = 70, cualquier cosa hay que cambiarlo de aca
+	 * de isr.h, isr.asm.
+	 */	 
+	
 }

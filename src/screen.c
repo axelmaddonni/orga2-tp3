@@ -49,12 +49,14 @@ void screen_inicializar()
 {
 	//limpio la pantalla
 	screen_pintar_rect(0x00, 0x77, 0, 0, 50, 80);
-	//barra negra
+	//barra negra abajo
 	screen_pintar_rect(0x00, 0x00, 45, 0, 5, 80);
+    //barra negra arriba
+	screen_pintar_rect(0x00, 0x00, 0, 0, 1, 80);
 	//barra roja
-	screen_pintar_rect(0x00, 0xCC, 45, 30 , 5, 10);
+	screen_pintar_rect(0x00, 0xCC, 45, 33 , 5, 7);
 	//barra azul
-	screen_pintar_rect(0x00, 0x99, 45, 40 , 5, 10);
+	screen_pintar_rect(0x00, 0x99, 45, 40 , 5, 7);
 
 }
 

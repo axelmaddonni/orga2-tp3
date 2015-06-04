@@ -22,6 +22,11 @@ extern mmu_inicializar_tabla_kernel
 extern mmu_inicializar_dir_pirata
 extern inicializar_mmu
 
+;; INTERRUPCIONES (EJERCICIO 5)
+extern resetear_pic
+extern habilitar_pic
+
+
 ;; Saltear seccion de datos
 jmp start
 
@@ -116,7 +121,7 @@ modoprotegido:
 
     call inicializar_mmu
     call mmu_inicializar_dir_pirata
-    xchg bx, bx
+    ;xchg bx, bx
     mov cr3, eax
    
 
@@ -128,7 +133,7 @@ modoprotegido:
     ;call print
     ;;;;; ES SOLO UN  TEST QUE SUGIEREN
     
-    
+
     ; Inicializar tss
 
     ; Inicializar tss de la tarea Idle
@@ -148,13 +153,21 @@ modoprotegido:
      sub eax, 0x0000000
      
     ; Configurar controlador de interrupciones
-
+    call resetear_pic
+    call habilitar_pic
+    
     ; Cargar tarea inicial
 
     ; Habilitar interrupciones
-
+    sti 
+    
+    xchg bx, bx
+    int 0x46
+    
+    
     ; Saltar a la primera tarea: Idle
-
+    
+    
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF
     mov ebx, 0xFFFF
