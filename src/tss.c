@@ -8,6 +8,7 @@
 #include "tss.h"
 #include "mmu.h"
 
+extern void *dar_siguiente();
 
 tss tss_inicial;
 tss tss_idle;
@@ -35,8 +36,8 @@ void tss_inicializar_idle(){
     
     gdt[GDT_TAREA_IDLE] = (gdt_entry) { // falta
         (unsigned short)    0x0067,         /* limit[0:15]  */
-        (unsigned short)    (&tss_idle),    /* base[0:15]   */
-        ((unsigned char)     (&tss_idle))>>16,/* base[23:16]  */
+        (unsigned short)    ((unsigned int) (&tss_idle)),    /* base[0:15]   */
+        (unsigned char)     (((unsigned int) (&tss_idle)) >>16),/* base[23:16]  */
         (unsigned char)     0x09,           /* type = r/w   */
         (unsigned char)     0x00,           /* system       */
         (unsigned char)     0x00,           /* dpl          */
@@ -46,7 +47,7 @@ void tss_inicializar_idle(){
         (unsigned char)     0x00,           /* l            */
         (unsigned char)     0x00,           /* db           */
         (unsigned char)     0x00,           /* g            */
-        ((unsigned char)     (&tss_idle))>>24,/* base[31:24]  */
+        (unsigned char)     (((unsigned int) (&tss_idle)) >>24), /* base[31:24]  */
     };
     
 }
@@ -55,11 +56,11 @@ void tss_inicializar_idle(){
 
 void tss_inicializar(tss * tss_tarea,  pde * cr3_nuevo) {
 	
-	tss_idle.eip = 0x400000; // 0x00010000 + 0x1000 * indice_codigo;
+    tss_idle.eip = 0x400000; // 0x00010000 + 0x1000 * indice_codigo;
 	
 	//pde * nuevo_cr3 = mmu_inicializar_dir_pirata(fisica en el mapa, que codigo de tarea correr);
 	
-	tss_idle.cr3 = cr3_nuevo;
+    tss_idle.cr3 = (unsigned int) cr3_nuevo;
 	
 	
     tss_idle.ebp = tss_idle.eip + 0x1000; 
@@ -70,7 +71,7 @@ void tss_inicializar(tss * tss_tarea,  pde * cr3_nuevo) {
     mapear(cr3, fisica, virtual);
     
     */
-    tss_idle.esp0 = dar_siguiente()+0x1000;
+    tss_idle.esp0 = (unsigned int) dar_siguiente() + 0x1000;
     tss_idle.ss0 = 0x48;  //ver kernel.asm
     
     tss_idle.ds = 0x5b; 
