@@ -10,6 +10,7 @@
 
 #include "defines.h"
 
+#define GDT_TAREA_IDLE 14
 
 
 typedef struct str_gdt_descriptor {

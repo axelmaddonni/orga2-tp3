@@ -99,6 +99,10 @@ modoprotegido:
     push dword 0
     push MENSAJE_MODO_PROTEGIDO
     call print
+    add esp, 4*4
+    
+    ;mov fs, 1001000b chequear despues
+
     ; Inicializar el juego
 
     ; Inicializar pantalla
@@ -160,9 +164,7 @@ modoprotegido:
 
     ; Habilitar interrupciones
     sti 
-    
-    xchg bx, bx
-    int 0x46
+  
     
     
     ; Saltar a la primera tarea: Idle

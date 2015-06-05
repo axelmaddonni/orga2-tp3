@@ -65,8 +65,8 @@ void mmu_inicializar_tabla_kernel_para_pirata(pte * tabla){
 	for(i = 0; i<1024; i++){
       tabla[i].base_address = i;
       tabla[i].present = 1;
-      tabla[i].read_write = 0;            // ESTO PUEDE SER
-      tabla[i].user_supervisor = 0;       // FRUTA
+      tabla[i].read_write = 0;  
+      tabla[i].user_supervisor = 1; 
 	}
 }
 
@@ -84,10 +84,11 @@ pde * mmu_inicializar_dir_pirata(){
   resultado[0].base_address = ((uint) tabla_kernel)>>12;
   resultado[0].read_write = 0;
   resultado[0].present = 1;
-  resultado[0].user_supervisor = 0; //supervisor, puede estar mal
+  resultado[0].user_supervisor = 0; //ok
   
   
   //FALTA TODO LO DEL CODIGO!!!!
+  //Falta mapear posicion inicial y mapa descubierto
 
 
   return resultado;
