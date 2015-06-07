@@ -46,6 +46,7 @@ _isr%1:
     push MENSAJE_ERROR_%1
     call print
     
+    xchg bx, bx
     
     jmp $
 

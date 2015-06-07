@@ -141,3 +141,24 @@ void mmu_unmapear_pagina(uint virtual, pde * cr3){
 
 
 
+void testear_paginacion(){
+  int cr3 = 0x27000;
+
+  uint m1 = 0x400000;
+  uint m2 = 0x800000;
+
+  mmu_mapear_pagina(m1, (pde *) cr3, 0x500000, 0, 0);
+  mmu_mapear_pagina(m2, (pde *) cr3, 0x500000, 0, 0); 
+
+  *(uint *) m1 = 0x55AA;
+
+  if( *(uint *) m2 != 0x55AA){
+    *((uint *) 0xf00000) = 40;//pagefault
+  }
+
+  mmu_unmapear_pagina(m1, (pde *) cr3);
+  mmu_unmapear_pagina(m2, (pde *) cr3);
+
+}
+
+

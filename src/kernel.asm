@@ -13,6 +13,9 @@ extern screen_inicializar
 extern idt_inicializar
 extern IDT_DESC
 
+extern testear_paginacion
+
+
 ;; PAGINACION (EJERCICIO 3)
 extern mmu_inicializar_dir_kernel
 extern mmu_inicializar_tabla_kernel
@@ -129,7 +132,7 @@ modoprotegido:
     call inicializar_mmu
     call mmu_inicializar_dir_pirata
     ;xchg bx, bx
-    mov cr3, eax
+    ;mov cr3, eax
    
 
     ;;;; ESTO SE DEBE BORRAR DE LA  VERSION FINAL
@@ -173,6 +176,10 @@ modoprotegido:
 
     ; Habilitar interrupciones
     sti 
+
+    ; esto no tiene que ir en la version final, pero lo podemos
+    ; usar para ir testeando de a poco
+    call testear_paginacion
   
     ; Saltar a la primera tarea: Idle
     ;xchg bx, bx

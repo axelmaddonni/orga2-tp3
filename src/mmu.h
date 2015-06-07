@@ -59,6 +59,6 @@ void mmu_inicializar_dir_kernel();
 void mmu_inicializar();
 pde * mmu_inicializar_dir_pirata();
 
-
+void testear_paginacion();
 
 #endif	/* !__MMU_H__ */
