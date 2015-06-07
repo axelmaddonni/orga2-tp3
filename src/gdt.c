@@ -7,15 +7,6 @@
 
 #include "gdt.h"
 
-#define GDT_IDX_CODIGO_0 8
-#define GDT_IDX_DATOS_0 9
-#define GDT_IDX_CODIGO_3 10
-#define GDT_IDX_DATOS_3 11
-#define GDT_IDX_VIDEO 12
-#define GDT_TAREA_INICIAL 13
-
-
-
 
 /* Definicion de la GDT */
 /* -------------------------------------------------------------------------- */
@@ -125,7 +116,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
     
     [GDT_TAREA_INICIAL] = (gdt_entry) { // le ponemos fruta
-        (unsigned short)    0x0000,         /* limit[0:15]  */
+        (unsigned short)    0x0068,         /* limit[0:15]  */
         (unsigned short)    0x0000,         /* base[0:15]   */
         (unsigned char)     0x00,           /* base[23:16]  */
         (unsigned char)     0x09,           /* type = r/w   */

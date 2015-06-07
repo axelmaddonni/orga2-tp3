@@ -26,6 +26,9 @@ extern inicializar_mmu
 extern resetear_pic
 extern habilitar_pic
 
+;; TAREAS (EJERCICIO 6)
+extern tss_inicializar_idle
+extern tss_inicializar_tarea_inicial
 
 ;; Saltear seccion de datos
 jmp start
@@ -140,7 +143,11 @@ modoprotegido:
 
     ; Inicializar tss
 
+
+    call tss_inicializar_tarea_inicial
     ; Inicializar tss de la tarea Idle
+    call tss_inicializar_idle
+
 
     ; Inicializar el scheduler
 
@@ -161,13 +168,15 @@ modoprotegido:
     call habilitar_pic
     
     ; Cargar tarea inicial
+    mov ax, 0x68  ; 13 << 3
+    ltr ax
 
     ; Habilitar interrupciones
     sti 
   
-    
-    
     ; Saltar a la primera tarea: Idle
+    ;xchg bx, bx
+    jmp 0x70:0
     
     
     ; Ciclar infinitamente (por si algo sale mal...)

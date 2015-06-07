@@ -10,6 +10,12 @@
 
 #include "defines.h"
 
+#define GDT_IDX_CODIGO_0 8
+#define GDT_IDX_DATOS_0 9
+#define GDT_IDX_CODIGO_3 10
+#define GDT_IDX_DATOS_3 11
+#define GDT_IDX_VIDEO 12
+#define GDT_TAREA_INICIAL 13
 #define GDT_TAREA_IDLE 14
 
 
