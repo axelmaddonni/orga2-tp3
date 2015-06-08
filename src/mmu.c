@@ -71,7 +71,7 @@ void mmu_inicializar_tabla_kernel_para_pirata(pte * tabla){
 }
 
 
-pde * mmu_inicializar_dir_pirata(){
+pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata){
   //obtengo la siguiente libre
   pde * resultado = (pde *) dar_siguiente();
   // dar_siguiente lo devuelve en 0
@@ -89,10 +89,51 @@ pde * mmu_inicializar_dir_pirata(){
   
   //FALTA TODO LO DEL CODIGO!!!!
   //Falta mapear posicion inicial y mapa descubierto
+  
+  uint codigo_tarea;
+  if(jugador->jug == A){
+	if(pirata->tipo == EXPLORADOR) codigo_tarea =  0x10000;
+    else codigo_tarea = 0x11000;
+  } else{
+	if(pirata->tipo == EXPLORADOR) codigo_tarea = 0x12000;
+    else codigo_tarea = 0x13000;
+  }
+  
+  uint p[2];
+  p[0] = jugador->puerto[0];
+  p[1] = jugador->puerto[1];
+  //mapeo paginas
+  mmu_mapear_pagina(0x400000, resultado, game_xy2lineal(p[0],p[1])+0x500000, 1, 1);
+  uint i, j;
+  for(i = 0; i<MAPA_ALTO; i++){
+	  for(j = 0; j<MAPA_ANCHO; j++){
+	    if(jugador->posiciones_exploradas[i][j]){
+		  uint ind = (i*MAPA_ANCHO+j) * 0x1000;
+		  mmu_mapear_pagina(0x800000+ind, resultado, 0x500000+ind, 1, 1);
+	   }
+     }
+  }
+
+	  
+	  
+  //copio el codigo
+  //void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar user_supervisor)
+  mmu_mapear_pagina(0x400000, (pde *) 0x27000, game_xy2lineal(p[0],p[1])+0x500000, 1, 0);
+  copiar_pagina(codigo_tarea, 0x400000);
+  mmu_unmapear_pagina(0x400000, (pde *) 0x27000);
 
 
   return resultado;
 }
+
+void copiar_pagina(uint src, uint dest){
+	uint i;
+	for(i = 0; i<4096; i+=4){
+		*((uint *) (dest + i)) =  *((uint *) (src + i));
+	}
+}
+	
+
 
 // direccion virtual
 // | directorio  |    tabla    |    offset   |

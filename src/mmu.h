@@ -59,6 +59,11 @@ void mmu_inicializar_dir_kernel();
 void mmu_inicializar();
 pde * mmu_inicializar_dir_pirata();
 
+void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar user_supervisor);
+void mmu_unmapear_pagina(uint virtual, pde * cr3);
+
+void copiar_pagina(uint src, uint dest);
+
 void testear_paginacion();
 
 #endif	/* !__MMU_H__ */

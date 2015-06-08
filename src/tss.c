@@ -37,7 +37,7 @@ void tss_inicializar_idle(){
    
     tss_idle.fs = 0x48;
     
-    tss_idle.eflags = 0x00000002;
+    tss_idle.eflags = 0x00000202;
  
     tss_idle.iomap = 0xFFFF;
     tss_idle.cr3 = 0x27000;
@@ -69,7 +69,7 @@ void tss_inicializar_idle(){
  
     
     gdt[GDT_TAREA_IDLE] = (gdt_entry) { // falta
-        (unsigned short)    0x0068,         /* limit[0:15]  */
+        (unsigned short)    0x0068,         /* limit[0:15]  PREGUNTAR */  
         (unsigned short)    ((unsigned int) (&tss_idle) & 0xffff),    /* base[0:15]   */
         (unsigned char)     ((((unsigned int) (&tss_idle)) >>16) & 0xff),/* base[23:16]  */
         (unsigned char)     0x09,           /* type = r/w   */

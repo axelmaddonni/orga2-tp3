@@ -130,11 +130,11 @@ modoprotegido:
     mov cr0, eax
 
     call inicializar_mmu
-    call mmu_inicializar_dir_pirata
+    
+    
+    ;call mmu_inicializar_dir_pirata
     ;xchg bx, bx
     ;mov cr3, eax
-   
-
     ;;;; ESTO SE DEBE BORRAR DE LA  VERSION FINAL
     ;push dword 0x0e0e   ; notar que cambia el color
     ;push dword 2
@@ -145,9 +145,9 @@ modoprotegido:
     
 
     ; Inicializar tss
-
-
     call tss_inicializar_tarea_inicial
+    
+    
     ; Inicializar tss de la tarea Idle
     call tss_inicializar_idle
 
@@ -156,16 +156,11 @@ modoprotegido:
 
     ; Inicializar la IDT
     call idt_inicializar
-
     ; Cargar IDT
     
     lidt [IDT_DESC]
-     
-     mov ebx, 0
-     
-     or eax, 0xffffffff
-     sub eax, 0x0000000
-     
+    
+    
     ; Configurar controlador de interrupciones
     call resetear_pic
     call habilitar_pic
@@ -183,7 +178,7 @@ modoprotegido:
   
     ; Saltar a la primera tarea: Idle
     ;xchg bx, bx
-    jmp 0x70:0
+    jmp 0x70:0 ; 14 << 3   111|0000
     
     
     ; Ciclar infinitamente (por si algo sale mal...)
