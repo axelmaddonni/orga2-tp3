@@ -9,6 +9,7 @@
 #define __ISR_H__
 
 #include "screen.h"
+#include "game.h"
 
 void _isr0();
 void _isr1();
@@ -40,12 +41,16 @@ void _isr70();
 
 
 void handler_teclado(uchar scan_code){
-	if(scan_code == 0x1e) screen_pintar('a', 0x0f, 0, 79);	
-    if(scan_code == 0x2a){
+	if(scan_code == 0x1e){
+    screen_pintar('a', 0x0f, 0, 79);
+  }
+  else if(scan_code == 0x2a){
 		screen_pintar('<', 0x0f, 0, 79);
+    game_atender_teclado('<'); 
 	}
-	if(scan_code == 0x36){
+  else if(scan_code == 0x36){
 		screen_pintar('>', 0x0f, 0, 79);
+    game_atender_teclado('>');
 	}	
 }
 

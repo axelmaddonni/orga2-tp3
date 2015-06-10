@@ -30,8 +30,11 @@ extern resetear_pic
 extern habilitar_pic
 
 ;; TAREAS (EJERCICIO 6)
-extern tss_inicializar_idle
-extern tss_inicializar_tarea_inicial
+extern tss_inicializar
+extern tss_inicializar_tarea
+
+;; SCHEDULER (EJERCICIO 7)
+extern game_inicializar
 
 ;; Saltear seccion de datos
 jmp start
@@ -110,6 +113,7 @@ modoprotegido:
     ;mov fs, 1001000b chequear despues
 
     ; Inicializar el juego
+    call game_inicializar
 
     ; Inicializar pantalla
     call screen_inicializar
@@ -145,11 +149,11 @@ modoprotegido:
     
 
     ; Inicializar tss
-    call tss_inicializar_tarea_inicial
+    call tss_inicializar
     
     
     ; Inicializar tss de la tarea Idle
-    call tss_inicializar_idle
+    ; call tss_inicializar_idle
 
 
     ; Inicializar el scheduler

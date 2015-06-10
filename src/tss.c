@@ -77,47 +77,128 @@ void tss_inicializar_idle(){
         (unsigned char)     0x00,           /* dpl          */
         (unsigned char)     0x01,           /* p            */
         (unsigned char)     0x00,           /* limit[16:19] */
-        (unsigned char)     0x01,           /* avl          */
+        (unsigned char)     0x00,           /* avl          */
         (unsigned char)     0x00,           /* l            */
-        (unsigned char)     0x00,           /* db           */
+        (unsigned char)     0x01,           /* db           */
         (unsigned char)     0x00,           /* g            */
         (unsigned char)     (((unsigned int) (&tss_idle)) >>24), /* base[31:24]  */
     };
     
 }
 
+void tss_inicializar(){
+  tss_inicializar_tarea_inicial();
+  tss_inicializar_idle();
+
+  uint i;
+  for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
+    tss_jugadorA[i].cs = 0x53; //10 es la entrada en la gdt, entonces : 10<<3 | 0x3
+    tss_jugadorA[i].ds = 0x5b;
+    tss_jugadorA[i].es = 0x5b;
+    tss_jugadorA[i].gs = 0x5b;
+    tss_jugadorA[i].ss = 0x5b;
+    tss_jugadorA[i].fs = 0x5b;
+
+    tss_jugadorA[i].eflags = 0x202;
+    tss_jugadorA[i].iomap = 0xFFFF;
+
+    //15 es la proxima entrada vacia en la GDT
+    uint indice_gdt = i+15;
+
+    gdt[indice_gdt] = (gdt_entry) { // falta
+      (unsigned short)  0x0068,         /* limit[0:15]  PREGUNTAR */  
+      (unsigned short)  ((unsigned int) (&tss_jugadorA[i]) & 0xffff),    /* base[0:15]   */
+      (unsigned char)   ((((unsigned int) (&tss_jugadorA[i])) >>16) & 0xff),/* base[23:16]  */
+      (unsigned char)   0x09,           /* type = r/w   */
+      (unsigned char)   0x01,           /* system (BOCHS flashea con esto)    */
+      (unsigned char)   0x03,           /* dpl          */
+      (unsigned char)   0x01,           /* p            */
+      (unsigned char)   0x00,           /* limit[16:19] */
+      (unsigned char)   0x00,           /* avl          */
+      (unsigned char)   0x00,           /* l            */
+      (unsigned char)   0x01,           /* db           */
+      (unsigned char)   0x00,           /* g            */
+      (unsigned char)   (((unsigned int) (&tss_jugadorA[i])) >>24), /* base[31:24]  */
+    };  
+  }
+ 
+  for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
+    tss_jugadorB[i].cs = 0x53; //10 es la entrada en la gdt, entonces : 10<<3 | 0x3
+    tss_jugadorB[i].ds = 0x5b;
+    tss_jugadorB[i].es = 0x5b;
+    tss_jugadorB[i].gs = 0x5b;
+    tss_jugadorB[i].ss = 0x5b;
+    tss_jugadorB[i].fs = 0x5b;
+
+    tss_jugadorB[i].eflags = 0x202;
+    tss_jugadorB[i].iomap = 0xFFFF;
+
+    //15 es la proxima entrada vacia en la GDT
+    uint indice_gdt = i+15+MAX_CANT_PIRATAS_VIVOS;
+   
+    gdt[indice_gdt] = (gdt_entry) { // falta
+      (unsigned short)  0x0068,         /* limit[0:15]  PREGUNTAR */  
+      (unsigned short)  ((unsigned int) (&tss_jugadorB[i]) & 0xffff),    /* base[0:15]   */
+      (unsigned char)   ((((unsigned int) (&tss_jugadorB[i])) >>16) & 0xff),/* base[23:16]  */
+      (unsigned char)   0x09,           /* type = r/w   */
+      (unsigned char)   0x01,           /* system       */
+      (unsigned char)   0x03,           /* dpl          */
+      (unsigned char)   0x01,           /* p            */
+      (unsigned char)   0x00,           /* limit[16:19] */
+      (unsigned char)   0x00,           /* avl          */
+      (unsigned char)   0x00,           /* l            */
+      (unsigned char)   0x01,           /* db           */
+      (unsigned char)   0x00,           /* g            */
+      (unsigned char)   (((unsigned int) (&tss_jugadorB[i])) >>24), /* base[31:24]  */
+    };  
+  }  
+}
+
+void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo) {
+	
+    uint i = indice_tarea;
 
 
-void tss_inicializar(tss * tss_tarea,  pde * cr3_nuevo) {
-	
-    tss_idle.eip = 0x400000; // 0x00010000 + 0x1000 * indice_codigo;
-	
+    if(jugador == A){ 
+      tss_jugadorA[i].edi = 0x0;
+      tss_jugadorA[i].esi = 0x0;
+      tss_jugadorA[i].ebx = 0x0;
+      tss_jugadorA[i].ecx = 0x0;
+      tss_jugadorA[i].eax = 0x0;
+
+      tss_jugadorA[i].esp = 0x0401000 - 12; // por los parametros que le paso
+      tss_jugadorA[i].ebp = 0x0401000 - 12; //  igual
+      
+      tss_jugadorA[i].eip = 0x00400000;
+      tss_jugadorA[i].esp0 = (unsigned int) dar_siguiente() + 0x1000;
+      tss_jugadorA[i].ss0 = 0x48;  //ver kernel.asm
+      
+      tss_jugadorA[i].cr3 = (uint) cr3_nuevo;
+    } else{
+      tss_jugadorB[i].edi = 0x0;
+      tss_jugadorB[i].esi = 0x0;
+      tss_jugadorB[i].ebx = 0x0;
+      tss_jugadorB[i].ecx = 0x0;
+      tss_jugadorB[i].eax = 0x0;
+
+      tss_jugadorB[i].esp = 0x0401000 - 12; // por los parametros que le paso
+      tss_jugadorB[i].ebp = 0x0401000 - 12; //  igual
+      
+      tss_jugadorB[i].eip = 0x00400000;
+      tss_jugadorB[i].esp0 = (unsigned int) dar_siguiente() + 0x1000;
+      tss_jugadorB[i].ss0 = 0x48;  //ver kernel.asm
+      
+      tss_jugadorB[i].cr3 = (uint) cr3_nuevo;
+    }   
+
 	//pde * nuevo_cr3 = mmu_inicializar_dir_pirata(fisica en el mapa, que codigo de tarea correr);
 	
-    tss_idle.cr3 = (unsigned int) cr3_nuevo;
-	
-	
-    tss_idle.ebp = tss_idle.eip + 0x1000; 
-    tss_idle.esp = tss_idle.ebp;
     
     /*fisica = dame_pagina_libre();
     virtual = 0x335000;
     mapear(cr3, fisica, virtual);
     
     */
-    tss_idle.esp0 = (unsigned int) dar_siguiente() + 0x1000;
-    tss_idle.ss0 = 0x48;  //ver kernel.asm
-    
-    tss_idle.ds = 0x5b; 
-    tss_idle.es = 0x5b; 
-    tss_idle.gs = 0x5b; 
-    tss_idle.ss = 0x5b; 
-   
-    tss_idle.fs = 0x5b; 
-    
-    tss_idle.eflags = 0x00000002;
- 
-    tss_idle.iomap = 0xFFFF;
     
 }
 

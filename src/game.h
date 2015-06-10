@@ -23,6 +23,7 @@ typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion
 struct jugador_t;
 
 typedef enum {MINERO, EXPLORADOR} tipo_t;
+typedef enum {A, B} cual_t;
 
 
 typedef struct pirata_t
@@ -35,14 +36,13 @@ typedef struct pirata_t
     // id unica, posicion, tipo, reloj
 } pirata_t;
 
-typedef enum {A, B} cual_t;
-
 typedef struct jugador_t
 {
-    uint index;
-    pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
-    
     cual_t jug;
+    
+    pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
+    uchar vivos[MAX_CANT_PIRATAS_VIVOS];
+    
     
     //CUANDO SE INICIALIZA EL JUEGO PONERLO TODO EN 0
     uchar posiciones_exploradas[MAPA_ALTO][MAPA_ANCHO];
@@ -64,6 +64,7 @@ void game_pirata_erigir(pirata_t *pirata, jugador_t *j, uint tipo);
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y);
 void game_pirata_exploto(uint id);
 
+void game_inicializar();
 void game_jugador_inicializar(jugador_t *j);
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo, int x, int y);
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo);

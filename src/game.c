@@ -93,8 +93,9 @@ void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 }
 
 
-void game_inicializar()
-{
+void game_inicializar(){
+  game_jugador_inicializar(&jugadorA);
+  game_jugador_inicializar(&jugadorB);
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug)
@@ -105,9 +106,25 @@ void game_jugador_inicializar(jugador_t *j)
 {
 	static int index = 0;
 
-	j->index = index++;
+	j->jug = (cual_t) index++;
     // ~ completar ~
+  uint i, h;
+  for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
+    j->vivos[i] =  0;
+  }
 
+  for (i = 0; i<MAPA_ALTO; i++){
+    for(h = 0; h<MAPA_ANCHO; h++){
+      j->posiciones_exploradas[i][h] = 0;
+    }
+  }
+
+  if(j->jug == A){
+    j->puerto[0] = 0;
+    j->puerto[1] = 0;
+  } else{
+    //FALTA
+  }
 }
 
 void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint index, uint id)
@@ -205,6 +222,14 @@ void game_terminar_si_es_hora()
 #define KB_shiftB   0x36 // 0xb6
 
 
-void game_atender_teclado(unsigned char tecla)
-{
+void game_atender_teclado(unsigned char tecla){
+  if(tecla == '<'){ // jugadorA
+
+  } 
+
+
+
 }
+
+
+
