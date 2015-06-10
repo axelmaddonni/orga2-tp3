@@ -32,6 +32,9 @@ typedef struct pirata_t
     struct jugador_t *jugador;
     
     tipo_t tipo;
+    
+    uint id_pirata;
+    uint posicion[2];
 
     // id unica, posicion, tipo, reloj
 } pirata_t;

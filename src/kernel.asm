@@ -35,6 +35,8 @@ extern tss_inicializar_tarea
 
 ;; SCHEDULER (EJERCICIO 7)
 extern game_inicializar
+extern testear_crear_tarea
+
 
 ;; Saltear seccion de datos
 jmp start
@@ -101,6 +103,7 @@ modoprotegido:
 	mov ebp, 0x27000
 	mov esp, 0x27000
 	
+ 
 		
     ; Imprimir mensaje de bienvenida
     push dword 0x0f0f   ; fruta
@@ -168,7 +171,7 @@ modoprotegido:
     ; Configurar controlador de interrupciones
     call resetear_pic
     call habilitar_pic
-    
+     
     ; Cargar tarea inicial
     mov ax, 0x68  ; 13 << 3
     ltr ax
@@ -180,10 +183,13 @@ modoprotegido:
     ; usar para ir testeando de a poco
     call testear_paginacion
   
+    call testear_crear_tarea 
     ; Saltar a la primera tarea: Idle
     ;xchg bx, bx
-    jmp 0x70:0 ; 14 << 3   111|0000
-    
+    ;jmp 0x70:0 ; 14 << 3   111|0000
+  
+    xchg bx, bx
+    jmp 0x78:0
     
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF

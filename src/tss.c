@@ -6,7 +6,7 @@
 */
 
 #include "tss.h"
-#include "mmu.h"
+
 
 extern void *dar_siguiente();
 
@@ -99,7 +99,7 @@ void tss_inicializar(){
     tss_jugadorA[i].ss = 0x5b;
     tss_jugadorA[i].fs = 0x5b;
 
-    tss_jugadorA[i].eflags = 0x202;
+    tss_jugadorA[i].eflags = 0x002;
     tss_jugadorA[i].iomap = 0xFFFF;
 
     //15 es la proxima entrada vacia en la GDT
@@ -110,7 +110,7 @@ void tss_inicializar(){
       (unsigned short)  ((unsigned int) (&tss_jugadorA[i]) & 0xffff),    /* base[0:15]   */
       (unsigned char)   ((((unsigned int) (&tss_jugadorA[i])) >>16) & 0xff),/* base[23:16]  */
       (unsigned char)   0x09,           /* type = r/w   */
-      (unsigned char)   0x01,           /* system (BOCHS flashea con esto)    */
+      (unsigned char)   0x00,           /* system       */
       (unsigned char)   0x03,           /* dpl          */
       (unsigned char)   0x01,           /* p            */
       (unsigned char)   0x00,           /* limit[16:19] */
@@ -130,7 +130,7 @@ void tss_inicializar(){
     tss_jugadorB[i].ss = 0x5b;
     tss_jugadorB[i].fs = 0x5b;
 
-    tss_jugadorB[i].eflags = 0x202;
+    tss_jugadorB[i].eflags = 0x002;
     tss_jugadorB[i].iomap = 0xFFFF;
 
     //15 es la proxima entrada vacia en la GDT
@@ -141,7 +141,7 @@ void tss_inicializar(){
       (unsigned short)  ((unsigned int) (&tss_jugadorB[i]) & 0xffff),    /* base[0:15]   */
       (unsigned char)   ((((unsigned int) (&tss_jugadorB[i])) >>16) & 0xff),/* base[23:16]  */
       (unsigned char)   0x09,           /* type = r/w   */
-      (unsigned char)   0x01,           /* system       */
+      (unsigned char)   0x00,           /* system       */
       (unsigned char)   0x03,           /* dpl          */
       (unsigned char)   0x01,           /* p            */
       (unsigned char)   0x00,           /* limit[16:19] */
@@ -201,7 +201,6 @@ void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo) {
     */
     
 }
-
 
 
 

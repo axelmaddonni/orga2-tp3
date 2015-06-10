@@ -85,6 +85,7 @@ pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata){
   resultado[0].read_write = 0;
   resultado[0].present = 1;
   resultado[0].user_supervisor = 0; //ok
+  resultado[0].reserved = 0;
   
   
   //FALTA TODO LO DEL CODIGO!!!!
@@ -152,12 +153,13 @@ void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar use
 	  
 	  cr3[directorio].present = 1;
 	  cr3[directorio].read_write = rw;
-	  cr3[directorio].read_write = user_supervisor;
+	  cr3[directorio].user_supervisor = user_supervisor;
 	  cr3[directorio].base_address = ((uint) page_table) >> 12;
+    cr3[directorio].reserved = 0;
   } else{
       page_table = (pte *) (cr3[directorio].base_address << 12);
   }
-
+   
   page_table[tabla].user_supervisor = user_supervisor;
   page_table[tabla].read_write = rw;
   page_table[tabla].base_address = fisica >> 12;

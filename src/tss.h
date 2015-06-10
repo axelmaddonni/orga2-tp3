@@ -12,7 +12,7 @@
 #include "i386.h"
 #include "gdt.h"
 #include "game.h"
-
+#include "mmu.h"
 
 typedef struct str_tss {
     unsigned short  ptl;
@@ -58,6 +58,5 @@ typedef struct str_tss {
 void tss_inicializar();
 void tss_inicializar_idle();
 void tss_inicializar_tarea_inicial();
-
-
+void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo);
 #endif  /* !__TSS_H__ */

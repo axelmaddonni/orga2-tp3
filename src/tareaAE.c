@@ -8,9 +8,18 @@
 #include "defines.h"
 #include "game.h"
 #include "syscall.h"
+#include "i386.h"
 
 void task(int x, int y) {
     /* Tarea */
+
+
+  int i = 1;
+  while(1){
+    i = 2*i;
+  }
+ 
+
     int restantex = MAPA_ANCHO-3;
     int restantey = MAPA_ALTO-3;
 
