@@ -70,7 +70,7 @@ void game_pirata_exploto(uint id);
 void game_inicializar();
 void game_jugador_inicializar(jugador_t *j);
 void game_jugador_lanzar_pirata(jugador_t *j, uint tipo, int x, int y);
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo);
+pirata_t* game_jugador_erigir_pirata(jugador_t *j, tipo_t tipo);
 void game_jugador_anotar_punto(jugador_t *j);
 void game_explorar_posicion(jugador_t *jugador, int x, int y);
 

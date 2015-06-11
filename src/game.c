@@ -140,23 +140,31 @@ void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint tipo)
 {
 }
 
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo)
+pirata_t* game_jugador_erigir_pirata(jugador_t *j, tipo_t tipo)
 {
   static uint id = 0;
   
-  uint i;
-  for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
-    if(j->vivos[i]) break;
+  uint i=0;
+  while(j->vivos[i] != 0 && i<MAX_CANT_PIRATAS_VIVOS){
+    i++;
   }
   if(i == MAX_CANT_PIRATAS_VIVOS){
 	  return NULL;
   } else {
     pirata_t * nuevo = &(j->piratas[i]);
+    
+    nuevo->index = i;
 
     nuevo->id_pirata = id++;
     nuevo->jugador = j;
-    nuevo->tipo = (tipo_t) tipo; 
-
+    nuevo->tipo = tipo;
+/*    if(tipo == EXPLORADOR){
+		breakpoint();
+		print("explorador", 0,0, 0x00ff);
+	} else{
+		print ("minero", 0,0, 0x00ff);
+	}
+*/
     nuevo->posicion[0] = j->puerto[0];
     nuevo->posicion[1] = j->puerto[1];
 
@@ -250,10 +258,10 @@ void game_atender_teclado(unsigned char tecla){
 }
 
 void testear_crear_tarea(){
-  pirata_t * pir = game_jugador_erigir_pirata(&jugadorA, (uint) EXPLORADOR);
+  pirata_t * pir = game_jugador_erigir_pirata(&jugadorA, EXPLORADOR);
   pde * cr3 = mmu_inicializar_dir_pirata(&jugadorA, pir);
 
-  tss_inicializar_tarea(0, A, cr3);
+  tss_inicializar_tarea(pir->index, A, cr3);
 }
 
 
