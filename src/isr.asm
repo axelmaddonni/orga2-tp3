@@ -7,6 +7,7 @@
 %include "imprimir.mac"
 
 extern print
+extern game_syscall_manejar
 
 BITS 32
 
@@ -39,14 +40,15 @@ global _isr70
 
 	
 _isr%1:
+        xchg bx, bx
+
     mov eax, %1
     push dword 0x0f0f   ; fruta
     push dword 0
     push dword 0
     push MENSAJE_ERROR_%1
     call print
-    
-    xchg bx, bx
+
     
     jmp $
 
@@ -128,8 +130,19 @@ _isr33:
 
 
 _isr70:
-  mov eax, 0x42
+  pushad
+  pushfd
+  
+  push ecx
+  push eax
+  call game_syscall_manejar
+  pop eax
+  pop ecx
 
+ 
+  popfd
+  popad
+  
   iret
 
 MENSAJE_ERROR_0: db 'Interrupcion de division por 0. (Error 0)', 0

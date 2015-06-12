@@ -76,7 +76,13 @@ void idt_inicializar() {
 	//TECLADO
 	IDT_ENTRY(33);
 	//INTERRUPCION
-	IDT_ENTRY(70); 
+	//IDT_ENTRY(70); 
+	
+	idt[70].offset_0_15 = (unsigned short) ((unsigned int)(&_isr70) & (unsigned int) 0xFFFF);        \
+    idt[70].segsel = (unsigned short) 0x0040;                                                                  \
+    idt[70].attr = (unsigned short) 0xee00;                                                                  \
+    idt[70].offset_16_31 = (unsigned short) ((unsigned int)(&_isr70) >> 16 & (unsigned int) 0xFFFF);
+
 	/* por las dudas, 0x46 = 70, cualquier cosa hay que cambiarlo de aca
 	 * de isr.h, isr.asm.
 	 */	 

@@ -81,7 +81,6 @@ start:
 	or eax, 1
 	mov cr0, eax
     ; Saltar a modo protegido
-
 	jmp 0x40:modoprotegido
     ; Establecer selectores de segmentos
 
@@ -98,7 +97,7 @@ modoprotegido:
     
 	mov ax, 1100000b
     mov fs, ax
-    
+
     ; Establecer la base de la pila
 	mov ebp, 0x27000
 	mov esp, 0x27000
@@ -115,8 +114,8 @@ modoprotegido:
     
     ;mov fs, 1001000b chequear despues
 
-    ; Inicializar el juego
-    call game_inicializar
+	mov ax,  1001000b
+    mov fs, ax
 
     ; Inicializar pantalla
     call screen_inicializar
@@ -139,9 +138,6 @@ modoprotegido:
     call inicializar_mmu
     
     
-    ;call mmu_inicializar_dir_pirata
-    ;xchg bx, bx
-    ;mov cr3, eax
     ;;;; ESTO SE DEBE BORRAR DE LA  VERSION FINAL
     ;push dword 0x0e0e   ; notar que cambia el color
     ;push dword 2
@@ -171,24 +167,23 @@ modoprotegido:
     ; Configurar controlador de interrupciones
     call resetear_pic
     call habilitar_pic
-     
+     ; Inicializar el juego
+        call game_inicializar
+
     ; Cargar tarea inicial
     mov ax, 0x68  ; 13 << 3
     ltr ax
 
     ; Habilitar interrupciones
     sti 
+ 
 
-    ; esto no tiene que ir en la version final, pero lo podemos
-    ; usar para ir testeando de a poco
-    call testear_paginacion
-  
+    
     call testear_crear_tarea 
     ; Saltar a la primera tarea: Idle
     ;xchg bx, bx
     ;jmp 0x70:0 ; 14 << 3   111|0000
   
-    xchg bx, bx
     jmp 0x78:0
     
     ; Ciclar infinitamente (por si algo sale mal...)
