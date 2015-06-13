@@ -91,13 +91,26 @@ ISR 19
 ;;
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
+
+offset: dd 0
+selector: dw 0
 _isr32:
   pushad
   pushfd
     
+
   call fin_intr_pic1
-  call game_tick
   
+  call sched_tick
+ 
+  
+  str cx
+  cmp ax, cx
+  je .fin
+    mov [selector], ax
+   jmp far [offset]
+  
+  .fin
   popfd
   popad
   
@@ -138,6 +151,7 @@ _isr70:
   call game_syscall_manejar
   add esp, 8
 
+  ;jmp 0x70:0 ;voy a idle
  
   popfd
   popad

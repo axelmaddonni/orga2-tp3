@@ -151,8 +151,18 @@ void game_jugador_inicializar(jugador_t *j)
   
 }
 
-void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint index, uint id)
-{
+void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo){
+  
+  print("lanzando pirata", 0,0,0x0f0f);
+  pirata_t * pir = game_jugador_erigir_pirata(jugador, tipo);
+  if(pir != NULL){
+    pde * cr3 = mmu_inicializar_dir_pirata(jugador, pir);
+    pir->cr3 = (uint) cr3;
+
+    tss_inicializar_tarea(pir->index, jugador->jug, cr3);
+  }
+  //si es null y es minero, encolar
+
 }
 
 void game_tick(uint id_pirata){
@@ -372,7 +382,11 @@ void game_terminar_si_es_hora()
 
 void game_atender_teclado(unsigned char tecla){
   if(tecla == '<'){ // jugadorA
+    game_pirata_inicializar(&jugadorA, EXPLORADOR);
+  } 
 
+  else if(tecla == '>'){ // jugadorA
+    game_pirata_inicializar(&jugadorB, EXPLORADOR);
   } 
 }
 

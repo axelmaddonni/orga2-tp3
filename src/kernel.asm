@@ -179,12 +179,12 @@ modoprotegido:
  
 
     
-    call testear_crear_tarea 
+    ;call testear_crear_tarea 
     ; Saltar a la primera tarea: Idle
-    ;xchg bx, bx
-    ;jmp 0x70:0 ; 14 << 3   111|0000
+    ;xchg bx, bx 
+    jmp 0x70:0 ; 14 << 3   111|0000
   
-    jmp 0x78:0
+    ;jmp 0x78:0
     
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF

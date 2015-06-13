@@ -10,5 +10,12 @@
 
 #include "game.h"
 
+struct {
+  uint indiceA;
+  uint indiceB;
+
+  cual_t proximo;
+} sched_struct;
+
 
 #endif	/* !__SCHED_H__ */
