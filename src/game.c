@@ -241,7 +241,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 			break;
 	}
 	
-	/*
+	
 	int explorado_x[3];
 	int explorado_y[3];
   
@@ -252,97 +252,60 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 	explorado_y[0] = pir->posicion[1]-1;
 	explorado_y[1] = pir->posicion[1];
 	explorado_y[2] = pir->posicion[1]+1;
-*/
+
 	jugador_t * jug = pir->jugador;
 
-	print("llego aca", 0, 0, 0x0f0f);
-	breakpoint();
-
-	if(en_rango(pir->posicion[0]-1, pir->posicion[1]-1)) jug->posiciones_exploradas[pir->posicion[1]-1][pir->posicion[0]-1] = 1;
-	if(en_rango(pir->posicion[0]  , pir->posicion[1]-1)) jug->posiciones_exploradas[pir->posicion[1]-1][pir->posicion[0]  ] = 1;
-	if(en_rango(pir->posicion[0]+1, pir->posicion[1]-1)) jug->posiciones_exploradas[pir->posicion[1]-1][pir->posicion[0]+1] = 1;
-	if(en_rango(pir->posicion[0]-1, pir->posicion[1]  )) jug->posiciones_exploradas[pir->posicion[1]  ][pir->posicion[0]-1] = 1;
-	if(en_rango(pir->posicion[0]  , pir->posicion[1]  )) jug->posiciones_exploradas[pir->posicion[1]  ][pir->posicion[0]  ] = 1;
-	if(en_rango(pir->posicion[0]+1, pir->posicion[1]  )) jug->posiciones_exploradas[pir->posicion[1]  ][pir->posicion[0]+1] = 1;
-	if(en_rango(pir->posicion[0]-1, pir->posicion[1]+1)) jug->posiciones_exploradas[pir->posicion[1]+1][pir->posicion[0]-1] = 1;
-	if(en_rango(pir->posicion[0]  , pir->posicion[1]+1)) jug->posiciones_exploradas[pir->posicion[1]+1][pir->posicion[0]  ] = 1;
-	if(en_rango(pir->posicion[0]+1, pir->posicion[1]+1)) jug->posiciones_exploradas[pir->posicion[1]+1][pir->posicion[0]+1] = 1;
-
-
-
-
-	//uint i, h;
-	/*for(i = 0; i<3; i++){
+	uint i, h;
+	for(i = 0; i<3; i++){
 		for(h = 0; h<3; h++){
-			if(en_rango(explorado_x[h], explorado_y[i]))jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] = 1;
+			if(en_rango(explorado_x[h], explorado_y[i]))
+        jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] = 1;
 		}
 	}
 	
-	*/
 	
-	print("hola", 0, 0, 0x0f0f);
-	breakpoint();
-
-
-	uint p;
-	for(p = 0; p<MAX_CANT_PIRATAS_VIVOS; p++){
-		print("termino", 0, 0, 0x0f0f);breakpoint();
-		if(!(jug->vivos[p])){
-			
-			continue;
-		}
-		print("termino1", 0, 0, 0x0f0f);breakpoint();
-		if(en_rango(pir->posicion[0]-1, pir->posicion[1]-1)) {uint ind = ((pir->posicion[1]-1)*MAPA_ANCHO+(pir->posicion[0]-1)) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		print("termino2", 0, 0, 0x0f0f);breakpoint();
-		if(en_rango(pir->posicion[0]  , pir->posicion[1]-1)) {uint ind = ((pir->posicion[1]-1)*MAPA_ANCHO+(pir->posicion[0]  )) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]+1, pir->posicion[1]-1)) {uint ind = ((pir->posicion[1]-1)*MAPA_ANCHO+(pir->posicion[0]+1)) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]-1, pir->posicion[1]  )) {uint ind = ((pir->posicion[1]  )*MAPA_ANCHO+(pir->posicion[0]-1)) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]  , pir->posicion[1]  )) {uint ind = ((pir->posicion[1]  )*MAPA_ANCHO+(pir->posicion[0]  )) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]+1, pir->posicion[1]  )) {uint ind = ((pir->posicion[1]  )*MAPA_ANCHO+(pir->posicion[0]+1)) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]-1, pir->posicion[1]+1)) {uint ind = ((pir->posicion[1]+1)*MAPA_ANCHO+(pir->posicion[0]-1)) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]  , pir->posicion[1]+1)) {uint ind = ((pir->posicion[1]+1)*MAPA_ANCHO+(pir->posicion[0]  )) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-		if(en_rango(pir->posicion[0]+1, pir->posicion[1]+1)) {uint ind = ((pir->posicion[1]+1)*MAPA_ANCHO+(pir->posicion[0]+1)) * 0x1000;mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);}
-
-	}
-/*
-	uint p;
+  //print("chau", 0, 0, 0x0f0f); breakpoint();
+  uint p;
 	for(p = 0; p<MAX_CANT_PIRATAS_VIVOS; p++){
 		if(!jug->vivos[p])
 			continue;
 		for(i = 0; i<3; i++){
-			for(h = 0; h<3; h++){
-				
+			for(h = 0; h<3; h++){			
 				if(en_rango(explorado_x[i], explorado_y[h])){
-					uint ind = (i*MAPA_ANCHO+h) * 0x1000;
+					uint ind = (explorado_y[h]*MAPA_ANCHO+explorado_x[i]) * 0x1000;
 					mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);
 				}
 			}
 		}
 	}
-*/
 
 	
 	uint indice_viejo = (y_viejo*MAPA_ANCHO+x_viejo) * 0x1000;
 	uint indice_nuevo = (pir->posicion[1]*MAPA_ANCHO+pir->posicion[0]) * 0x1000;
-    
-    //copiamos el codigo
-	copiar_pagina(0x800000+indice_viejo, 0x800000+indice_nuevo);
-	//cambiamos el resto
+  
+ // print("sadf", 0, 0, 0x0f0f);breakpoint();
+
+  //cambiamos el resto
 	mmu_mapear_pagina(0x400000, (pde *) pir->cr3, 0x500000+indice_nuevo, 1, 1);
-	/*
-	// pintar pantalla
+  //copiamos el codigo
+	copiar_pagina(0x800000+indice_viejo, 0x400000);
+	//copiar_pagina(0x800000+indice_viejo, 0x400000);
+	
+  // pintar pantalla
 	for(i = 0; i<3; i++){
 		for(h = 0; h<3; h++){
 			if(en_rango(explorado_x[i], explorado_y[h]))
-				screen_pintar_rect(0, jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
+				screen_pintar_rect(0, jug->color, explorado_y[h]+1, explorado_x[i], 1, 1);
 		}
-	}	
-	
-	*/
-	
+	}
+  screen_pintar_rect('E', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
+  screen_pintar_rect('E', jug->color, y_viejo+1, x_viejo, 1, 1);
 
 	
-    return 0;
+	//print("hola", 0, 0, 0x0f0f); breakpoint();
+
+	
+  return 0;
 }
 
 uint game_syscall_cavar(uint id)
@@ -420,6 +383,7 @@ void testear_crear_tarea(){
 		pir->cr3 = (uint) cr3;
 
 		tss_inicializar_tarea(pir->index, A, cr3);
+    id_del_pirata_actual = pir->id_pirata; 
 		// pintar la pantalla con la nueva posicion del chabon
 	}
 }

@@ -136,8 +136,7 @@ _isr70:
   push ecx
   push eax
   call game_syscall_manejar
-  pop eax
-  pop ecx
+  add esp, 8
 
  
   popfd
