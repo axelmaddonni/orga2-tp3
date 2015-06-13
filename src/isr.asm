@@ -122,7 +122,8 @@ _isr32:
 _isr33:
   pushad
   pushfd
-  
+
+  xor eax, eax
   in al, 0x60
   push eax
   call handler_teclado
@@ -151,7 +152,7 @@ _isr70:
   call game_syscall_manejar
   add esp, 8
 
-  ;jmp 0x70:0 ;voy a idle
+  jmp 0x70:0 ;voy a idle
  
   popfd
   popad

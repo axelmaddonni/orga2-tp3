@@ -93,10 +93,10 @@ pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata){
   
   uint codigo_tarea;
   if(jugador->jug == A){
-	if(pirata->tipo == EXPLORADOR) codigo_tarea =  0x10000;
+	  if(pirata->tipo == EXPLORADOR) codigo_tarea =  0x10000;
     else codigo_tarea = 0x11000;
   } else{
-	if(pirata->tipo == EXPLORADOR) codigo_tarea = 0x12000;
+	  if(pirata->tipo == EXPLORADOR) codigo_tarea = 0x12000;
     else codigo_tarea = 0x13000;
   }
   

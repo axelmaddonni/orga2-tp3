@@ -153,7 +153,7 @@ void game_jugador_inicializar(jugador_t *j)
 
 void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo){
   
-  print("lanzando pirata", 0,0,0x0f0f);
+  print("lanzando pirata", 0,0,0x0f0f); breakpoint();
   pirata_t * pir = game_jugador_erigir_pirata(jugador, tipo);
   if(pir != NULL){
     pde * cr3 = mmu_inicializar_dir_pirata(jugador, pir);
@@ -381,11 +381,11 @@ void game_terminar_si_es_hora()
 
 
 void game_atender_teclado(unsigned char tecla){
+  breakpoint();
   if(tecla == '<'){ // jugadorA
     game_pirata_inicializar(&jugadorA, EXPLORADOR);
   } 
-
-  else if(tecla == '>'){ // jugadorA
+  else if(tecla == '>'){ // jugadorB
     game_pirata_inicializar(&jugadorB, EXPLORADOR);
   } 
 }
