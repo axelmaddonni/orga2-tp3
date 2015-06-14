@@ -54,5 +54,9 @@ void handler_teclado(uchar scan_code){
 	}	
 }
 
+void matar_tarea(){
+  game_pirata_exploto(id_del_pirata_actual); 
+}
+
 
 #endif  /* !__ISR_H__ */

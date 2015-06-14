@@ -15,6 +15,18 @@ void sched_inicializar(){
   sched_struct.proximo = A;
 }
 
+
+void inicializar_minero(){
+  pirata_t * pir = id_pirata2pirata(id_del_pirata_actual);
+  jugador_t * jug = pir->jugador; 
+  if(jug->mineros_pendientes.proximo_a_ejecutar < jug->mineros_pendientes.proximo_libre){
+    uint x = jug->mineros_pendientes.ms[jug->mineros_pendientes.proximo_a_ejecutar].x_botin;
+    uint y = jug->mineros_pendientes.ms[jug->mineros_pendientes.proximo_a_ejecutar].y_botin;
+    jug->mineros_pendientes.proximo_a_ejecutar++;
+    game_pirata_inicializar(jug, MINERO, x,y );
+  }
+}
+
 void sched_setear_id_actual(uint ind, cual_t jugador){
   if(jugador == A){
     id_del_pirata_actual = jugadorA.piratas[ind].id_pirata;
@@ -36,6 +48,7 @@ uchar sched_proxima_a_ejecutar(){
       if(jugadorA.vivos[iA]){
         sched_struct.proximo = B;
         sched_setear_id_actual(iA, A);
+        inicializar_minero(); 
         return (iA+15)<<3; //las tareas de A empiezan en 15
       }
     } while(sched_struct.indiceA != viejo_iA);   
@@ -46,7 +59,8 @@ uchar sched_proxima_a_ejecutar(){
       sched_struct.indiceB = (sched_struct.indiceB+1)%8; //++
       if(jugadorB.vivos[iB]){
         sched_struct.proximo = A;
-        sched_setear_id_actual(iB, B);
+        sched_setear_id_actual(iB, B); 
+        inicializar_minero(); 
         return (iB+23)<<3; //las tareas de B empiezan en 23
       }
     } while(sched_struct.indiceB != viejo_iB);    
@@ -57,7 +71,8 @@ uchar sched_proxima_a_ejecutar(){
       sched_struct.indiceB = (sched_struct.indiceB+1)%8; //++
       if(jugadorB.vivos[iB]){
         sched_struct.proximo = A;
-        sched_setear_id_actual(iB, B);
+        sched_setear_id_actual(iB, B); 
+        inicializar_minero(); 
         return (iB+23)<<3; //las tareas de B empiezan en 23
       }
     } while(sched_struct.indiceB != viejo_iB);    
@@ -69,7 +84,9 @@ uchar sched_proxima_a_ejecutar(){
       if(jugadorA.vivos[iA]){
         sched_struct.proximo = B;
         sched_setear_id_actual(iA, A);
+       inicializar_minero(); 
         return (iA+15)<<3; //las tareas de A empiezan en 15
+        
       }
     } while(sched_struct.indiceA != viejo_iA); 
   }
@@ -96,6 +113,7 @@ uchar sched_tick(){
   //print(a, 0,0,0x0f0f);
 
 
+  
   return sched_proxima_a_ejecutar();
 }
 

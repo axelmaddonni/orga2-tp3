@@ -47,6 +47,11 @@ typedef struct pirata_t
     // id unica, posicion, tipo, reloj
 } pirata_t;
 
+typedef struct{
+  uint x_botin;
+  uint y_botin;
+} minero_obj;
+
 typedef struct jugador_t
 {
     cual_t jug;
@@ -55,9 +60,16 @@ typedef struct jugador_t
     uchar vivos[MAX_CANT_PIRATAS_VIVOS];
     
     uchar color;
+
+    struct {
+      minero_obj ms[10]; //cabeza
+      uint proximo_a_ejecutar;
+      uint proximo_libre;
+      
+    } mineros_pendientes;
+
     
     uint monedas;
-
     //CUANDO SE INICIALIZA EL JUEGO PONERLO TODO EN 0
     uchar posiciones_exploradas[MAPA_ALTO][MAPA_ANCHO];
     int puerto[2];

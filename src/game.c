@@ -24,7 +24,7 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 #define BOTINES_CANTIDAD 8
 
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
-                                        /*{30,  3, 50}*/{1, 1, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
+                                        {10, 2, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}
                                     };
 
@@ -156,19 +156,26 @@ void game_jugador_inicializar(jugador_t *j)
     j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]+1] = 1;
     
     j->monedas = 0;
+
+    j->mineros_pendientes.proximo_a_ejecutar = 0;
+    j->mineros_pendientes.proximo_libre = 0;
+
+
 }
 
 void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo, uint xparam, uint yparam){ 
   pirata_t * pir = game_jugador_erigir_pirata(jugador, tipo);
   if(pir != NULL){
-    pde * cr3 = mmu_inicializar_dir_pirata(jugador, pir, xparam, yparam);
+    pde * cr3 = mmu_inicializar_dir_pirata(jugador, pir, xparam, yparam); 
     pir->cr3 = (uint) cr3;
 
     tss_inicializar_tarea(pir->index, jugador->jug, cr3);
     screen_actualizar_reloj_pirata(jugador, pir);
   }
   //si es null y es minero, encolar
-
+  if(tipo == MINERO){
+    breakpoint();
+  }
 
 }
 
@@ -185,7 +192,6 @@ void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint tipo)
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, tipo_t tipo)
 {
   static uint id = 1;
-  
   uint i=0;
   while(j->vivos[i] != 0 && i<MAX_CANT_PIRATAS_VIVOS){
     i++;
@@ -230,7 +236,9 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f)
 
 void game_lanzar_minero(jugador_t *j, int x, int y)
 {
-  game_pirata_inicializar(j, MINERO, x, y);
+  j->mineros_pendientes.ms[j->mineros_pendientes.proximo_libre] = (minero_obj) {x, y};
+  j->mineros_pendientes.proximo_libre++;
+  //game_pirata_inicializar(j, MINERO, x, y);
   //NO ANDA, sospecho que es porque no estan inicializados los syscalls
 }
 
@@ -240,8 +248,7 @@ uint en_rango(int x, int y){
 
 
 uint game_syscall_pirata_mover(uint id, direccion dir)
-{
-
+{ 
     pirata_t * pir = id_pirata2pirata(id);
     if (!pir) return -1;
     //si id_pirata2pirata devuelve NULL, cancelar todo a la gaver
@@ -285,20 +292,25 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   if(pir->tipo == MINERO && !jug->posiciones_exploradas[pir->posicion[1]][pir->posicion[0]]){
     return -1; //si un minero cae a una posicion no explorada
   }
-
+  
   if(pir->tipo == EXPLORADOR){
+  
+
   	uint i, h;
   	for(i = 0; i<3; i++){
   		for(h = 0; h<3; h++){
   			if(en_rango(explorado_x[h], explorado_y[i])){
-          jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] = 1;
-          if(game_valor_tesoro(explorado_x[h], explorado_y[i])){    //si hay un botin con monedas
-            game_lanzar_minero(jug, explorado_x[h], explorado_y[i]);//lanzo minero
+          
+          if(game_valor_tesoro(explorado_x[h], explorado_y[i]) && jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] == 0){    //si hay un botin con monedas
+            game_lanzar_minero(jug, explorado_x[h], explorado_y[i]);//lanzo minero 
           }
+          jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] = 1;
         }
   		}
   	}
   	
+
+
     uint p;
   	for(p = 0; p<MAX_CANT_PIRATAS_VIVOS; p++){
   		if(!jug->vivos[p])
@@ -313,7 +325,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   		}
   	}
   
-    // pintar pantalla
+   // pintar pantalla
   	for(i = 0; i<3; i++){
   		for(h = 0; h<3; h++){
   			if(en_rango(explorado_x[i], explorado_y[h]))
@@ -322,24 +334,27 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   	}
   }
 
+  if(pir->tipo == MINERO){
+    breakpoint();
+  }
+
+
   if(pir->tipo == EXPLORADOR){
     screen_pintar_rect('E', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
     screen_pintar_rect('E', jug->color, y_viejo+1, x_viejo, 1, 1);
   } else{
     screen_pintar_rect('M', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
     screen_pintar_rect('M', jug->color, y_viejo+1, x_viejo, 1, 1);
-    //breakpoint();
+   
   }
-	
+
   uint indice_viejo = (y_viejo*MAPA_ANCHO+x_viejo) * 0x1000;
 	uint indice_nuevo = (pir->posicion[1]*MAPA_ANCHO+pir->posicion[0]) * 0x1000;
   
   //cambiamos el resto
 	mmu_mapear_pagina(0x400000, (pde *) pir->cr3, 0x500000+indice_nuevo, 1, 1);
   //copiamos el codigo
-	copiar_pagina(0x800000+indice_viejo, 0x400000);
-	
-	
+	copiar_pagina(0x800000+indice_viejo, 0x400000);	
   return 0;
 }
 
@@ -377,6 +392,7 @@ uint game_syscall_pirata_posicion(uint id, int idx)
     if (!pir) return -3;
     jugador_t * jug = pir->jugador;
     uint x, y;
+    breakpoint();
     if (idx == -1)
     {
         x = pir->posicion[0]; 
@@ -393,18 +409,27 @@ uint game_syscall_pirata_posicion(uint id, int idx)
 
 uint game_syscall_manejar(uint syscall, uint param1)
 {
+  uint res;
     if(syscall == 1){
-		game_syscall_pirata_mover(id_del_pirata_actual, (direccion) param1);
-	} else if(syscall == 2){
-		game_syscall_cavar(id_del_pirata_actual);
-	} else if(syscall == 3){
-		game_syscall_pirata_posicion(id_del_pirata_actual, param1);
-	} 
-    return 0;
+      //print("mover", 0,0,0x0f0f);breakpoint();
+		res = game_syscall_pirata_mover(id_del_pirata_actual, (direccion) param1);
+	//print("mov::", 0,0,0x0f0f);breakpoint();
+    } else if(syscall == 2){
+    print("cavar", 0,0,0x0f0f);breakpoint();
+		res = game_syscall_cavar(id_del_pirata_actual);
+    print("cav::", 0,0,0x0f0f);breakpoint();
+	} else if(syscall == 3){  
+    print("posic", 0,0,0x0f0f);breakpoint();
+    res = game_syscall_pirata_posicion(id_del_pirata_actual, param1);
+    print("pos::", 0,0,0x0f0f);breakpoint();
+  } 
+    
+    return res;
 }
 
-void game_pirata_exploto(uint id)
-{
+void game_pirata_exploto(uint id){
+  pirata_t * pir = id_pirata2pirata(id);
+  pir->jugador->vivos[pir->index] = 0;
 }
 
 pirata_t* game_pirata_en_posicion(uint x, uint y)
