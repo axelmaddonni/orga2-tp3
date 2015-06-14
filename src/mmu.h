@@ -57,7 +57,8 @@ typedef struct pte_t {
 void mmu_inicializar_dir_kernel();
 
 void mmu_inicializar();
-pde * mmu_inicializar_dir_pirata();
+
+pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata, uint xparam, uint yparam);
 
 void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar user_supervisor);
 void mmu_unmapear_pagina(uint virtual, pde * cr3);

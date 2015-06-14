@@ -28,7 +28,7 @@ uchar sched_proxima_a_ejecutar(){
     uint viejo_iA = sched_struct.indiceA;
     do{ 
       uint iA = sched_struct.indiceA;
-      sched_struct.indiceA = sched_struct.indiceA == 7? 0 : sched_struct.indiceA+1; //++
+      sched_struct.indiceA = (sched_struct.indiceA+1)%8; //++
       if(jugadorA.vivos[iA]){
         sched_struct.proximo = B;
         sched_setear_id_actual(iA, A);
@@ -39,7 +39,7 @@ uchar sched_proxima_a_ejecutar(){
     uint viejo_iB = sched_struct.indiceB;
     do{ 
       uint iB = sched_struct.indiceB;
-      sched_struct.indiceB = sched_struct.indiceB == 7? 0 : sched_struct.indiceB+1; //++
+      sched_struct.indiceB = (sched_struct.indiceB+1)%8; //++
       if(jugadorB.vivos[iB]){
         sched_struct.proximo = A;
         sched_setear_id_actual(iB, B);
@@ -50,7 +50,7 @@ uchar sched_proxima_a_ejecutar(){
     uint viejo_iB = sched_struct.indiceB;
     do{ 
       uint iB = sched_struct.indiceB;
-      sched_struct.indiceB = sched_struct.indiceB == 7? 0 : sched_struct.indiceB+1; //++
+      sched_struct.indiceB = (sched_struct.indiceB+1)%8; //++
       if(jugadorB.vivos[iB]){
         sched_struct.proximo = A;
         sched_setear_id_actual(iB, B);
@@ -61,7 +61,7 @@ uchar sched_proxima_a_ejecutar(){
     uint viejo_iA = sched_struct.indiceA;
     do{ 
       uint iA = sched_struct.indiceA;
-      sched_struct.indiceA = sched_struct.indiceA == 7? 0 : sched_struct.indiceA+1; //++
+      sched_struct.indiceA = (sched_struct.indiceA+1)%8; //++
       if(jugadorA.vivos[iA]){
         sched_struct.proximo = B;
         sched_setear_id_actual(iA, A);

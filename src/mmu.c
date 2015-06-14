@@ -71,7 +71,7 @@ void mmu_inicializar_tabla_kernel_para_pirata(pte * tabla){
 }
 
 
-pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata){
+pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata, uint xparam, uint yparam){
   //obtengo la siguiente libre
   pde * resultado = (pde *) dar_siguiente();
   // dar_siguiente lo devuelve en 0
@@ -121,6 +121,9 @@ pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata){
   //void mmu_mapear_pagina(uint virtual, pde * cr3, uint fisica, uchar rw, uchar user_supervisor)
   mmu_mapear_pagina(0x400000, (pde *) 0x27000, game_xy2lineal(p[0],p[1])*0x1000+0x500000, 1, 0); //puede que vaya 1
   copiar_pagina(codigo_tarea, 0x400000);
+  *((uint *) 0x400ffc) = yparam; // parametros que toma
+  *((uint *) 0x400ff8) = xparam; // la tarea
+  *((uint *) 0x400ff4) = 0;//direccion de retorno, es fruta
   mmu_unmapear_pagina(0x400000, (pde *) 0x27000);
 
 

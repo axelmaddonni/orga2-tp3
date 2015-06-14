@@ -151,12 +151,10 @@ void game_jugador_inicializar(jugador_t *j)
   
 }
 
-void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo){
-  
-  //print("lanzando pirata", 0,0,0x0f0f); breakpoint();
+void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo, uint xparam, uint yparam){ 
   pirata_t * pir = game_jugador_erigir_pirata(jugador, tipo);
   if(pir != NULL){
-    pde * cr3 = mmu_inicializar_dir_pirata(jugador, pir);
+    pde * cr3 = mmu_inicializar_dir_pirata(jugador, pir, xparam, yparam);
     pir->cr3 = (uint) cr3;
 
     tss_inicializar_tarea(pir->index, jugador->jug, cr3);
@@ -167,6 +165,7 @@ void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo){
 
 void game_tick(uint id_pirata){
 	screen_actualizar_reloj_global();
+  //actualizar tambien el reloj del pirata
 }
 
 
@@ -220,9 +219,15 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f)
 {
 }
 
+void game_lanzar_minero(jugador_t *j, int x, int y){
+  game_pirata_inicializar(j, MINERO, x, y);
+  //NO ANDA, sospecho que es porque no estan inicializados los syscalls
+}
+
 uint en_rango(int x, int y){
 	return (x>=0) && (y>=0) && (x<MAPA_ANCHO) && (y<MAPA_ALTO);
 }
+
 
 uint game_syscall_pirata_mover(uint id, direccion dir)
 {
@@ -230,8 +235,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
     pirata_t * pir = id_pirata2pirata(id);
     uint x_viejo = pir->posicion[0]; 
     uint y_viejo = pir->posicion[1]; 
-
-
+    
     switch(dir){
 		case ARR:
 			if(pir->posicion[1] == 0) return -1;
@@ -263,57 +267,66 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 	explorado_y[1] = pir->posicion[1];
 	explorado_y[2] = pir->posicion[1]+1;
 
+
 	jugador_t * jug = pir->jugador;
 
-	uint i, h;
-	for(i = 0; i<3; i++){
-		for(h = 0; h<3; h++){
-			if(en_rango(explorado_x[h], explorado_y[i]))
-        jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] = 1;
-		}
-	}
-	
-	
-  //print("chau", 0, 0, 0x0f0f); breakpoint();
-  uint p;
-	for(p = 0; p<MAX_CANT_PIRATAS_VIVOS; p++){
-		if(!jug->vivos[p])
-			continue;
-		for(i = 0; i<3; i++){
-			for(h = 0; h<3; h++){			
-				if(en_rango(explorado_x[i], explorado_y[h])){
-					uint ind = (explorado_y[h]*MAPA_ANCHO+explorado_x[i]) * 0x1000;
-					mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);
-				}
-			}
-		}
-	}
+  if(pir->tipo == MINERO && !jug->posiciones_exploradas[pir->posicion[1]][pir->posicion[0]]){
+    return -1; //si un minero cae a una posicion no explorada
+  }
 
+  if(pir->tipo == EXPLORADOR){
+  	uint i, h;
+  	for(i = 0; i<3; i++){
+  		for(h = 0; h<3; h++){
+  			if(en_rango(explorado_x[h], explorado_y[i])){
+          jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] = 1;
+          if(game_valor_tesoro(explorado_x[h], explorado_y[i])){    //si hay un botin con monedas
+            game_lanzar_minero(jug, explorado_x[h], explorado_y[i]);//lanzo minero
+          }
+        }
+  		}
+  	}
+  	
+    uint p;
+  	for(p = 0; p<MAX_CANT_PIRATAS_VIVOS; p++){
+  		if(!jug->vivos[p])
+  			continue;
+  		for(i = 0; i<3; i++){
+  			for(h = 0; h<3; h++){			
+  				if(en_rango(explorado_x[i], explorado_y[h])){
+  					uint ind = (explorado_y[h]*MAPA_ANCHO+explorado_x[i]) * 0x1000;
+  					mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);
+  				}
+  			}
+  		}
+  	}
+  
+    // pintar pantalla
+  	for(i = 0; i<3; i++){
+  		for(h = 0; h<3; h++){
+  			if(en_rango(explorado_x[i], explorado_y[h]))
+  				screen_pintar_rect(0, jug->color, explorado_y[h]+1, explorado_x[i], 1, 1);
+  		}
+  	}
+  }
+
+  if(pir->tipo == EXPLORADOR){
+    screen_pintar_rect('E', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
+    screen_pintar_rect('E', jug->color, y_viejo+1, x_viejo, 1, 1);
+  } else{
+    screen_pintar_rect('M', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
+    screen_pintar_rect('M', jug->color, y_viejo+1, x_viejo, 1, 1);
+    breakpoint();
+  }
 	
-	uint indice_viejo = (y_viejo*MAPA_ANCHO+x_viejo) * 0x1000;
+  uint indice_viejo = (y_viejo*MAPA_ANCHO+x_viejo) * 0x1000;
 	uint indice_nuevo = (pir->posicion[1]*MAPA_ANCHO+pir->posicion[0]) * 0x1000;
   
- // print("sadf", 0, 0, 0x0f0f);breakpoint();
-
   //cambiamos el resto
 	mmu_mapear_pagina(0x400000, (pde *) pir->cr3, 0x500000+indice_nuevo, 1, 1);
   //copiamos el codigo
 	copiar_pagina(0x800000+indice_viejo, 0x400000);
-	//copiar_pagina(0x800000+indice_viejo, 0x400000);
 	
-  // pintar pantalla
-	for(i = 0; i<3; i++){
-		for(h = 0; h<3; h++){
-			if(en_rango(explorado_x[i], explorado_y[h]))
-				screen_pintar_rect(0, jug->color, explorado_y[h]+1, explorado_x[i], 1, 1);
-		}
-	}
-  screen_pintar_rect('E', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
-  screen_pintar_rect('E', jug->color, y_viejo+1, x_viejo, 1, 1);
-
-	
-	//print("hola", 0, 0, 0x0f0f); breakpoint();
-
 	
   return 0;
 }
@@ -339,9 +352,7 @@ uint game_syscall_manejar(uint syscall, uint param1)
 		game_syscall_cavar(id_del_pirata_actual);
 	} else if(syscall == 3){
 		game_syscall_pirata_posicion(id_del_pirata_actual, param1);
-	}
-
-    //falta saltar a la tarea idle
+	} 
     return 0;
 }
 
@@ -382,17 +393,17 @@ void game_terminar_si_es_hora()
 
 void game_atender_teclado(unsigned char tecla){ 
   if(tecla == '<'){ // jugadorA
-    game_pirata_inicializar(&jugadorA, EXPLORADOR);
+    game_pirata_inicializar(&jugadorA, EXPLORADOR, jugadorA.puerto[0], jugadorA.puerto[1]);
   } 
   else if(tecla == '>'){ // jugadorB
-    game_pirata_inicializar(&jugadorB, EXPLORADOR);
+    game_pirata_inicializar(&jugadorB, EXPLORADOR, jugadorB.puerto[0], jugadorB.puerto[1]);
   } 
 }
 
 void testear_crear_tarea(){
   pirata_t * pir = game_jugador_erigir_pirata(&jugadorA, EXPLORADOR);
 	if(pir != NULL){
-		pde * cr3 = mmu_inicializar_dir_pirata(&jugadorA, pir);
+		pde * cr3 = mmu_inicializar_dir_pirata(&jugadorA, pir, 1, 1);
 		pir->cr3 = (uint) cr3;
 
 		tss_inicializar_tarea(pir->index, A, cr3);
