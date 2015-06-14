@@ -24,7 +24,7 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 #define BOTINES_CANTIDAD 8
 
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
-                                        {30,  3, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
+                                        /*{30,  3, 50}*/{1, 1, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}
                                     };
 
@@ -112,43 +112,50 @@ void game_jugador_inicializar_mapa(jugador_t *jug)
 
 void game_jugador_inicializar(jugador_t *j)
 {
-	static int index = 0;
+    static int index = 0;
 
-	j->jug = (cual_t) index++;
+    j->jug = (cual_t) index++;
     // ~ completar ~
-  uint i;  
-  for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
-    j->vivos[i] =  0;
-  }
-
-  uint h;
-  for (i = 0; i<MAPA_ALTO; i++){
-    for(h = 0; h<MAPA_ANCHO; h++){
-      j->posiciones_exploradas[i][h] = 0;
+    uint i;  
+    for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++)
+    {
+        j->vivos[i] =  0;
     }
-  }
-  
-  if(j->jug == A){
-    j->puerto[0] = POS_INIT_A_X;
-    j->puerto[1] = POS_INIT_A_Y;
-    j->color = (0x2 << 4); //verde
 
-  } else{
-    j->puerto[0] = POS_INIT_B_X;
-    j->puerto[1] = POS_INIT_B_Y;
-    j->color = (0x3 << 4); //cyan
-  }
-  
-	j->posiciones_exploradas[j->puerto[1]-1][j->puerto[0]-1] = 1;
-	j->posiciones_exploradas[j->puerto[1]  ][j->puerto[0]-1] = 1;
-	j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]-1] = 1;
-	j->posiciones_exploradas[j->puerto[1]-1][j->puerto[0]  ] = 1;
-	j->posiciones_exploradas[j->puerto[1]  ][j->puerto[0]  ] = 1;
-	j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]  ] = 1;
-	j->posiciones_exploradas[j->puerto[1]-1][j->puerto[0]+1] = 1;
-	j->posiciones_exploradas[j->puerto[1]  ][j->puerto[0]+1] = 1;
-	j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]+1] = 1;
-  
+    uint h;
+    for (i = 0; i<MAPA_ALTO; i++)
+    {
+        for(h = 0; h<MAPA_ANCHO; h++)
+        {
+            j->posiciones_exploradas[i][h] = 0;
+        }
+    }
+
+    if(j->jug == A)
+    {
+        j->puerto[0] = POS_INIT_A_X;
+        j->puerto[1] = POS_INIT_A_Y;
+        j->color = (0x2 << 4); //verde
+
+    }
+    else
+    {
+        j->puerto[0] = POS_INIT_B_X;
+        j->puerto[1] = POS_INIT_B_Y;
+        j->color = (0x3 << 4); //cyan
+    }
+
+    j->posiciones_exploradas[j->puerto[1]-1][j->puerto[0]-1] = 1;
+    j->posiciones_exploradas[j->puerto[1]  ][j->puerto[0]-1] = 1;
+    j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]-1] = 1;
+    j->posiciones_exploradas[j->puerto[1]-1][j->puerto[0]  ] = 1;
+    j->posiciones_exploradas[j->puerto[1]  ][j->puerto[0]  ] = 1;
+    j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]  ] = 1;
+    j->posiciones_exploradas[j->puerto[1]-1][j->puerto[0]+1] = 1;
+    j->posiciones_exploradas[j->puerto[1]  ][j->puerto[0]+1] = 1;
+    j->posiciones_exploradas[j->puerto[1]+1][j->puerto[0]+1] = 1;
+    
+    j->monedas = 0;
 }
 
 void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo, uint xparam, uint yparam){ 
@@ -221,8 +228,9 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f)
 {
 }
 
-void game_lanzar_minero(jugador_t *j, int x, int y){
-  //game_pirata_inicializar(j, MINERO, x, y);
+void game_lanzar_minero(jugador_t *j, int x, int y)
+{
+  game_pirata_inicializar(j, MINERO, x, y);
   //NO ANDA, sospecho que es porque no estan inicializados los syscalls
 }
 
@@ -235,6 +243,8 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 {
 
     pirata_t * pir = id_pirata2pirata(id);
+    if (!pir) return -1;
+    //si id_pirata2pirata devuelve NULL, cancelar todo a la gaver
     uint x_viejo = pir->posicion[0]; 
     uint y_viejo = pir->posicion[1]; 
     
@@ -318,7 +328,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   } else{
     screen_pintar_rect('M', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
     screen_pintar_rect('M', jug->color, y_viejo+1, x_viejo, 1, 1);
-    breakpoint();
+    //breakpoint();
   }
 	
   uint indice_viejo = (y_viejo*MAPA_ANCHO+x_viejo) * 0x1000;
@@ -335,15 +345,50 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 
 uint game_syscall_cavar(uint id)
 {
-    // ~ completar ~
+    //breakpoint();
+    pirata_t * pir = id_pirata2pirata(id);
+    if (!pir) return -3;
+    if (pir->tipo != MINERO) return -2;
+    //-1 para cuando se queda sin monedas en el botin, -2 para cuando no es un minero (que joraca hace cavando un no-minero?)
+    uint x = pir->posicion[0]; 
+    uint y = pir->posicion[1]; 
 
-	return 0;
+    uint i;
+    for (i = 0; i < BOTINES_CANTIDAD; i++)
+    {
+        if (x == botines[i][0] && y == botines[i][1])
+        {
+            if (botines[i][2] > 0) 
+            {
+                (pir->jugador)->monedas++;
+                return --botines[i][2];
+            }
+            else return -1;
+        }
+    }
+
+    return 0;
 }
 
 uint game_syscall_pirata_posicion(uint id, int idx)
 {
-    // ~ completar ~
-    return 0;
+    if (idx < -1 || idx > 7) return -1;
+    pirata_t * pir = id_pirata2pirata(id);
+    if (!pir) return -3;
+    jugador_t * jug = pir->jugador;
+    uint x, y;
+    if (idx == -1)
+    {
+        x = pir->posicion[0]; 
+        y = pir->posicion[1]; 
+    }
+    else
+    {
+        if (!jug->vivos[idx]) return -2;
+        x = (jug->piratas[idx]).posicion[0]; 
+        y = (jug->piratas[idx]).posicion[1];
+    }
+    return (y << 8 | x);
 }
 
 uint game_syscall_manejar(uint syscall, uint param1)

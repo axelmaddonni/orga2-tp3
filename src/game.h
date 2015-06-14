@@ -56,6 +56,8 @@ typedef struct jugador_t
     
     uchar color;
     
+    uint monedas;
+
     //CUANDO SE INICIALIZA EL JUEGO PONERLO TODO EN 0
     uchar posiciones_exploradas[MAPA_ALTO][MAPA_ANCHO];
     int puerto[2];
