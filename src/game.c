@@ -174,7 +174,7 @@ void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo, uint xparam, uint 
   }
   //si es null y es minero, encolar
   if(tipo == MINERO){
-    breakpoint();
+    //breakpoint();
   }
 
 }
@@ -319,7 +319,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   			for(h = 0; h<3; h++){			
   				if(en_rango(explorado_x[i], explorado_y[h])){
   					uint ind = (explorado_y[h]*MAPA_ANCHO+explorado_x[i]) * 0x1000;
-  					mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 1, 1);
+  					mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 0, 1);
   				}
   			}
   		}
@@ -332,10 +332,6 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   				screen_pintar_rect(0, jug->color, explorado_y[h]+1, explorado_x[i], 1, 1);
   		}
   	}
-  }
-
-  if(pir->tipo == MINERO){
-    breakpoint();
   }
 
 
@@ -360,7 +356,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 
 uint game_syscall_cavar(uint id)
 {
-    //breakpoint();
+    
     pirata_t * pir = id_pirata2pirata(id);
     if (!pir) return -3;
     if (pir->tipo != MINERO) return -2;
@@ -392,7 +388,7 @@ uint game_syscall_pirata_posicion(uint id, int idx)
     if (!pir) return -3;
     jugador_t * jug = pir->jugador;
     uint x, y;
-    breakpoint();
+   
     if (idx == -1)
     {
         x = pir->posicion[0]; 
@@ -415,13 +411,13 @@ uint game_syscall_manejar(uint syscall, uint param1)
 		res = game_syscall_pirata_mover(id_del_pirata_actual, (direccion) param1);
 	//print("mov::", 0,0,0x0f0f);breakpoint();
     } else if(syscall == 2){
-    print("cavar", 0,0,0x0f0f);breakpoint();
+    //print("cavar", 0,0,0x0f0f);breakpoint();
 		res = game_syscall_cavar(id_del_pirata_actual);
-    print("cav::", 0,0,0x0f0f);breakpoint();
+    //print("cav::", 0,0,0x0f0f);breakpoint();
 	} else if(syscall == 3){  
-    print("posic", 0,0,0x0f0f);breakpoint();
+    //print("posic", 0,0,0x0f0f);breakpoint();
     res = game_syscall_pirata_posicion(id_del_pirata_actual, param1);
-    print("pos::", 0,0,0x0f0f);breakpoint();
+    //print("pos::", 0,0,0x0f0f);breakpoint();
   } 
     
     return res;
@@ -430,6 +426,12 @@ uint game_syscall_manejar(uint syscall, uint param1)
 void game_pirata_exploto(uint id){
   pirata_t * pir = id_pirata2pirata(id);
   pir->jugador->vivos[pir->index] = 0;
+  
+  if(pir->jugador->jug == A){
+    screen_pintar('X', C_BW, 47, 4+2*pir->index);
+  }else {
+    screen_pintar('X', C_BW, 47, 59+2*pir->index);
+  }
 }
 
 pirata_t* game_pirata_en_posicion(uint x, uint y)

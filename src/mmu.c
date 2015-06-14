@@ -110,7 +110,7 @@ pde * mmu_inicializar_dir_pirata(jugador_t * jugador, pirata_t * pirata, uint xp
 	  for(j = 0; j<MAPA_ANCHO; j++){
 	    if(jugador->posiciones_exploradas[i][j]){
 		  uint ind = (i*MAPA_ANCHO+j) * 0x1000;
-		  mmu_mapear_pagina(0x800000+ind, resultado, 0x500000+ind, 1, 1);
+		  mmu_mapear_pagina(0x800000+ind, resultado, 0x500000+ind, 0, 1);
 	   }
      }
   }
