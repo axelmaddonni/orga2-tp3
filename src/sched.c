@@ -16,10 +16,14 @@ void sched_inicializar(){
 }
 
 void sched_setear_id_actual(uint ind, cual_t jugador){
-  if(jugador == A)
+  if(jugador == A){
     id_del_pirata_actual = jugadorA.piratas[ind].id_pirata;
-  else
+    screen_actualizar_reloj_pirata(&jugadorA, &jugadorA.piratas[ind]);
+  }
+  else{
     id_del_pirata_actual = jugadorB.piratas[ind].id_pirata;
+    screen_actualizar_reloj_pirata(&jugadorB, &jugadorB.piratas[ind]);
+  }
 }
 
 uchar sched_proxima_a_ejecutar(){

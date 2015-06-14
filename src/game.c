@@ -158,8 +158,10 @@ void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo, uint xparam, uint 
     pir->cr3 = (uint) cr3;
 
     tss_inicializar_tarea(pir->index, jugador->jug, cr3);
+    screen_actualizar_reloj_pirata(jugador, pir);
   }
   //si es null y es minero, encolar
+
 
 }
 
@@ -198,7 +200,7 @@ pirata_t* game_jugador_erigir_pirata(jugador_t *j, tipo_t tipo)
     nuevo->posicion[0] = j->puerto[0];
     nuevo->posicion[1] = j->puerto[1];
 
-    
+    nuevo->estado_reloj = 0; 
     
     // PUEDE SER QUE FALTE INICIALIZAR COSAS
     return nuevo;
@@ -220,7 +222,7 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f)
 }
 
 void game_lanzar_minero(jugador_t *j, int x, int y){
-  game_pirata_inicializar(j, MINERO, x, y);
+  //game_pirata_inicializar(j, MINERO, x, y);
   //NO ANDA, sospecho que es porque no estan inicializados los syscalls
 }
 

@@ -27,6 +27,17 @@ void screen_actualizar_reloj_global()
     screen_pintar(reloj[reloj_global], C_BW, 49, 79);
 }
 
+void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata){
+  
+    pirata->estado_reloj = (pirata->estado_reloj+ 1) % reloj_size;
+
+    if(j->jug == A){
+      screen_pintar(reloj[pirata->estado_reloj], C_BW, 47, 4+2*pirata->index);
+    }else {
+      screen_pintar(reloj[pirata->estado_reloj], C_BW, 47, 59+2*pirata->index);
+    }
+}
+
 void screen_pintar(uchar c, uchar color, uint fila, uint columna)
 {
     p[fila][columna].c = c;

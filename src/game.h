@@ -42,6 +42,8 @@ typedef struct pirata_t
     
     uint cr3;
 
+    uint estado_reloj;
+
     // id unica, posicion, tipo, reloj
 } pirata_t;
 
