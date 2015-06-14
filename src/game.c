@@ -250,26 +250,26 @@ uint en_rango(int x, int y){
 uint game_syscall_pirata_mover(uint id, direccion dir)
 { 
     pirata_t * pir = id_pirata2pirata(id);
-    if (!pir) return -1;
+    if (!pir) return ~0;
     //si id_pirata2pirata devuelve NULL, cancelar todo a la gaver
     uint x_viejo = pir->posicion[0]; 
     uint y_viejo = pir->posicion[1]; 
     
     switch(dir){
 		case ARR:
-			if(pir->posicion[1] == 0) return -1;
+			if(pir->posicion[1] == 0) return ~0;
 			else pir->posicion[1]--;
 			break;
 		case ABA:
-			if(pir->posicion[1] == MAPA_ALTO-1) return -1;
+			if(pir->posicion[1] == MAPA_ALTO-1) return ~0;
 			else pir->posicion[1]++;
 			break;
 		case DER:
-			if(pir->posicion[0] == MAPA_ANCHO-1) return -1;
+			if(pir->posicion[0] == MAPA_ANCHO-1) return ~0;
 			else pir->posicion[0]++;
 			break;
 		case IZQ:
-			if(pir->posicion[0] == 0) return -1;
+			if(pir->posicion[0] == 0) return ~0;
 			else pir->posicion[0]--;
 			break;
 	}
@@ -290,7 +290,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 	jugador_t * jug = pir->jugador;
 
   if(pir->tipo == MINERO && !jug->posiciones_exploradas[pir->posicion[1]][pir->posicion[0]]){
-    return -1; //si un minero cae a una posicion no explorada
+    return ~0; //si un minero cae a una posicion no explorada
   }
   
   if(pir->tipo == EXPLORADOR){
@@ -333,7 +333,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
   		}
   	}
   }
-
+  
 
   if(pir->tipo == EXPLORADOR){
     screen_pintar_rect('E', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
@@ -351,16 +351,17 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 	mmu_mapear_pagina(0x400000, (pde *) pir->cr3, 0x500000+indice_nuevo, 1, 1);
   //copiamos el codigo
 	copiar_pagina(0x800000+indice_viejo, 0x400000);	
-  return 0;
+
+  return 1;
 }
 
 uint game_syscall_cavar(uint id)
 {
     
     pirata_t * pir = id_pirata2pirata(id);
-    if (!pir) return -3;
-    if (pir->tipo != MINERO) return -2;
-    //-1 para cuando se queda sin monedas en el botin, -2 para cuando no es un minero (que joraca hace cavando un no-minero?)
+    if (!pir) return ~0;
+    if (pir->tipo != MINERO) return ~0;
+
     uint x = pir->posicion[0]; 
     uint y = pir->posicion[1]; 
 
@@ -372,20 +373,21 @@ uint game_syscall_cavar(uint id)
             if (botines[i][2] > 0) 
             {
                 (pir->jugador)->monedas++;
+                screen_pintar_puntajes();
                 return --botines[i][2];
             }
-            else return -1;
+            else return ~0;
         }
     }
 
-    return 0;
+    return 1;
 }
 
 uint game_syscall_pirata_posicion(uint id, int idx)
 {
-    if (idx < -1 || idx > 7) return -1;
+    if (idx < -1 || idx > 7) return ~0;
     pirata_t * pir = id_pirata2pirata(id);
-    if (!pir) return -3;
+    if (!pir) return ~0;
     jugador_t * jug = pir->jugador;
     uint x, y;
    
@@ -396,16 +398,17 @@ uint game_syscall_pirata_posicion(uint id, int idx)
     }
     else
     {
-        if (!jug->vivos[idx]) return -2;
+        if (!jug->vivos[idx]) return ~0;
         x = (jug->piratas[idx]).posicion[0]; 
         y = (jug->piratas[idx]).posicion[1];
     }
     return (y << 8 | x);
+    //SI DEVUELVE 0 NO TIENE QUE SALIR ERROR
 }
 
 uint game_syscall_manejar(uint syscall, uint param1)
 {
-  uint res;
+  uint res; //error = ~0
     if(syscall == 1){
       //print("mover", 0,0,0x0f0f);breakpoint();
 		res = game_syscall_pirata_mover(id_del_pirata_actual, (direccion) param1);
@@ -419,7 +422,7 @@ uint game_syscall_manejar(uint syscall, uint param1)
     res = game_syscall_pirata_posicion(id_del_pirata_actual, param1);
     //print("pos::", 0,0,0x0f0f);breakpoint();
   }
-    if (res<0){
+    if (res == ~0){
       error();
     }
     
@@ -430,10 +433,12 @@ void game_pirata_exploto(uint id){
   pirata_t * pir = id_pirata2pirata(id);
   pir->jugador->vivos[pir->index] = 0;
   
+
+
   if(pir->jugador->jug == A){
-    screen_pintar('X', C_BW, 47, 4+2*pir->index);
+    screen_pintar('X', 0x04, 48, 4+2*pir->index);
   }else {
-    screen_pintar('X', C_BW, 47, 59+2*pir->index);
+    screen_pintar('X', 0x01, 48, 59+2*pir->index);
   }
 }
 

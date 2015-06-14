@@ -24,6 +24,7 @@ typedef struct ca_s {
 } ca;
 
 
+
 struct pirata_t;
 typedef struct pirata_t pirata_t;
 
@@ -34,6 +35,7 @@ int ee_printf(const char *fmt, ...);
 
 void print(const char * text, unsigned int x, unsigned int y, unsigned short attr); //viene hecha
 void print_hex(unsigned int numero, int size, unsigned int x, unsigned int y, unsigned short attr); //viene hecha
+void print_dec(uint numero, int size, uint x, uint y, unsigned short attr); //viene hecha
 void screen_pintar(unsigned char c, unsigned char color, uint fila, uint columna);  //viene hecha
 
 void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho);

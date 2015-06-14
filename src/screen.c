@@ -32,9 +32,9 @@ void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata){
     pirata->estado_reloj = (pirata->estado_reloj+ 1) % reloj_size;
 
     if(j->jug == A){
-      screen_pintar(reloj[pirata->estado_reloj], C_BW, 47, 4+2*pirata->index);
+      screen_pintar(reloj[pirata->estado_reloj], C_BW, 48, 4+2*pirata->index);
     }else {
-      screen_pintar(reloj[pirata->estado_reloj], C_BW, 47, 59+2*pirata->index);
+      screen_pintar(reloj[pirata->estado_reloj], C_BW, 48, 59+2*pirata->index);
     }
 }
 
@@ -68,6 +68,26 @@ void screen_inicializar()
 	screen_pintar_rect(0x00, 0xCC, 45, 33 , 5, 7);
 	//barra azul
 	screen_pintar_rect(0x00, 0x99, 45, 40 , 5, 7);
+    
+    //puntajes
+    print_dec(jugadorA.monedas, 3, 35, 47, 0x4F);
+    print_dec(jugadorB.monedas, 3, 42, 47, 0x1F);
+
+    //slots
+    int i;
+    for (i = 1; i < 9; i++){
+        print_dec(i, 1, 2+2*i , 46, C_BW);
+        screen_pintar('X', 0x04 , 48, 2+2*i);
+        print_dec(i, 1, 57+2*i , 46, C_BW);
+        screen_pintar('X', 0x01 , 48, 57+2*i);
+    }
+
+}
+
+void screen_pintar_puntajes()
+{
+    print_dec(jugadorA.monedas, 3, 35, 47, 0x4F);
+    print_dec(jugadorB.monedas, 3, 42, 47, 0x1F);
 
 }
 

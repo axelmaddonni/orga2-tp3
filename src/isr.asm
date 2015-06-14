@@ -146,7 +146,13 @@ _isr33:
 
 
 _isr70:
-  pushad
+  push ecx
+  push edx
+  push ebx
+  push esp
+  push ebp
+  push esi
+  push edi
   pushfd
   
   push ecx
@@ -157,7 +163,13 @@ _isr70:
   jmp 0x70:0 ;voy a idle
  
   popfd
-  popad
+  pop edi
+  pop esi
+  pop ebp
+  pop esp
+  pop ebx
+  pop edx
+  pop ecx
   
   iret
 

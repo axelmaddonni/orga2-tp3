@@ -17,6 +17,7 @@ void task(int x, int y) {
 
     while(1)
     {
+        
         int i;
         for (i = 0; i < restantex; i++)
             syscall_mover(DER);
@@ -38,6 +39,8 @@ void task(int x, int y) {
 
         restantey = restantey - 3;
     }
+
+
 
     while(1) { __asm __volatile("mov $2, %%eax":::"eax"); }
 }
