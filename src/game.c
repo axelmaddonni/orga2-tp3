@@ -418,7 +418,10 @@ uint game_syscall_manejar(uint syscall, uint param1)
     //print("posic", 0,0,0x0f0f);breakpoint();
     res = game_syscall_pirata_posicion(id_del_pirata_actual, param1);
     //print("pos::", 0,0,0x0f0f);breakpoint();
-  } 
+  }
+    if (res<0){
+      error();
+    }
     
     return res;
 }

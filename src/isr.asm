@@ -41,18 +41,18 @@ global _isr70
 
 	
 _isr%1:
-    ;call matar_tarea
-    ;jmp 0x70:0 ;voy a idle
+    call matar_tarea
+    jmp 0x70:0 ;voy a idle
 
    
-    mov eax, %1
-    push dword 0x0f0f   ; fruta
-    push dword 0
-    push dword 0
-    push MENSAJE_ERROR_%1
-    call print
-    xchg bx, bx 
-    jmp $
+    ;mov eax, %1
+    ;push dword 0x0f0f   ; fruta
+    ;push dword 0
+    ;push dword 0
+    ;push MENSAJE_ERROR_%1
+    ;call print
+    ;xchg bx, bx 
+    ;jmp $
 
 %endmacro
 
