@@ -141,3 +141,10 @@ void print_dec(uint numero, int size, uint x, uint y, unsigned short attr) {
 }
 
 
+void screen_debug(){
+  while(modo_debug_activado){
+    ;
+  }
+}
+
+

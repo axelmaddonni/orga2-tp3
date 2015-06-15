@@ -104,6 +104,8 @@ void game_inicializar(){
   game_jugador_inicializar(&jugadorA);
   game_jugador_inicializar(&jugadorB);
   id_del_pirata_actual = -1;
+  modo_debug_activado = 0;
+  pantalla_debug_activada = 0;
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug)
@@ -434,6 +436,11 @@ void game_pirata_exploto(uint id){
   pirata_t * pir = id_pirata2pirata(id);
   pir->jugador->vivos[pir->index] = 0;
   
+  if(modo_debug_activado){
+    pantalla_debug_activada = 1;
+    screen_debug(); 
+    pantalla_debug_activada = 0;
+  }
 
 
   if(pir->jugador->jug == A){
@@ -475,12 +482,15 @@ void game_terminar_si_es_hora()
 
 
 void game_atender_teclado(unsigned char tecla){ 
-  if(tecla == '<'){ // jugadorA
+  if(tecla == '<' && !pantalla_debug_activada){ // jugadorA
     game_pirata_inicializar(&jugadorA, EXPLORADOR, jugadorA.puerto[0], jugadorA.puerto[1]);
   } 
-  else if(tecla == '>'){ // jugadorB
+  else if(tecla == '>' && !pantalla_debug_activada){ // jugadorB
     game_pirata_inicializar(&jugadorB, EXPLORADOR, jugadorB.puerto[0], jugadorB.puerto[1]);
-  } 
+  }
+  else if(tecla == 'y'){ 
+    modo_debug_activado = modo_debug_activado? 0: 1;
+  }
 }
 
 void testear_crear_tarea(){

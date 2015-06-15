@@ -52,11 +52,19 @@ void handler_teclado(uchar scan_code){
 		screen_pintar('>', 0x0f, 0, 79);
     game_atender_teclado('>');
 	}	
+  else if(scan_code == 0x15){
+		screen_pintar('y', 0x0f, 0, 79);
+    game_atender_teclado('y');
+  }
 }
 
 void matar_tarea(){
   game_pirata_exploto(id_del_pirata_actual); 
 }
 
+uint esta_pantalla_debug_activada(){
+  if(pantalla_debug_activada) return 1;
+  else return 0;
+}
 
 #endif  /* !__ISR_H__ */

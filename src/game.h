@@ -30,6 +30,10 @@ typedef enum {A, B} cual_t;
 uint id_del_pirata_actual;
 
 
+//dice si el modo debug esta activado o no
+uchar modo_debug_activado;
+uchar pantalla_debug_activada;
+
 typedef struct pirata_t
 {
     uint index;

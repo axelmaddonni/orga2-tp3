@@ -23,7 +23,7 @@ extern sched_tarea_actual
 
 ;; Reloj
 extern game_tick
-
+extern esta_pantalla_debug_activada
 
 ;;Teclado
 extern handler_teclado
@@ -41,6 +41,7 @@ global _isr70
 
 	
 _isr%1:
+    sti
     call matar_tarea
     jmp 0x70:0 ;voy a idle
 
@@ -99,10 +100,16 @@ selector: dw 0
 _isr32:
   pushad
   pushfd
-    
+  
 
   call fin_intr_pic1
   
+
+  call esta_pantalla_debug_activada
+  cmp eax, 1
+  je .fin
+  xor eax, eax
+
   call sched_tick
  
   
