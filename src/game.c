@@ -289,8 +289,9 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 
 	jugador_t * jug = pir->jugador;
 
-  if(pir->tipo == MINERO && !jug->posiciones_exploradas[pir->posicion[1]][pir->posicion[0]]){
-    return ~0; //si un minero cae a una posicion no explorada
+  if(pir->tipo == MINERO && jug->posiciones_exploradas[pir->posicion[1]][pir->posicion[0]] == 0){
+     //breakpoint();
+     return ~0; //si un minero cae a una posicion no explorada 
   }
   
   if(pir->tipo == EXPLORADOR){

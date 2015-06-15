@@ -159,8 +159,19 @@ void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo) {
     uint i = indice_tarea;
 
 
-    if(jugador == A){ 
-      tss_jugadorA[i].edi = 0x0;
+    if(jugador == A){
+ 
+    tss_jugadorA[i].cs = 0x53; //10 es la entrada en la gdt, entonces : 10<<3 | 0x3
+    tss_jugadorA[i].ds = 0x5b;
+    tss_jugadorA[i].es = 0x5b;
+    tss_jugadorA[i].gs = 0x5b;
+    tss_jugadorA[i].ss = 0x5b;
+    tss_jugadorA[i].fs = 0x5b;
+
+    tss_jugadorA[i].eflags = 0x002;
+    tss_jugadorA[i].iomap = 0xFFFF;
+    
+  tss_jugadorA[i].edi = 0x0;
       tss_jugadorA[i].esi = 0x0;
       tss_jugadorA[i].ebx = 0x0;
       tss_jugadorA[i].ecx = 0x0;
@@ -175,6 +186,17 @@ void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo) {
       
       tss_jugadorA[i].cr3 = (uint) cr3_nuevo;
     } else{
+
+    tss_jugadorB[i].cs = 0x53; //10 es la entrada en la gdt, entonces : 10<<3 | 0x3
+    tss_jugadorB[i].ds = 0x5b;
+    tss_jugadorB[i].es = 0x5b;
+    tss_jugadorB[i].gs = 0x5b;
+    tss_jugadorB[i].ss = 0x5b;
+    tss_jugadorB[i].fs = 0x5b;
+
+    tss_jugadorB[i].eflags = 0x002;
+    tss_jugadorB[i].iomap = 0xFFFF;
+
       tss_jugadorB[i].edi = 0x0;
       tss_jugadorB[i].esi = 0x0;
       tss_jugadorB[i].ebx = 0x0;
