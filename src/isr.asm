@@ -9,6 +9,9 @@
 extern print
 extern game_syscall_manejar
 
+;; DEBUGGING
+extern debug_info
+
 BITS 32
 
 sched_tarea_offset:     dd 0x00
@@ -41,6 +44,15 @@ global _isr70
 
 	
 _isr%1:
+    mov [debug_info + 00], eax
+    mov [debug_info + 04], ebx
+    mov [debug_info + 08], ecx
+    mov [debug_info + 12], edx
+    mov [debug_info + 16], esi
+    mov [debug_info + 20], edi
+    mov [debug_info + 24], ebp
+    mov [debug_info + 28], esp
+    ;mov [debug_info + 32], eip
     sti
     call matar_tarea
     jmp 0x70:0 ;voy a idle

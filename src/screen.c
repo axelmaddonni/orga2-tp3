@@ -14,9 +14,38 @@ extern jugador_t jugadorA, jugadorB;
 
 static ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
 
+ca backup[VIDEO_FILS][VIDEO_COLS];
+
 const char reloj[] = "|/-\\";
 #define reloj_size 4
 
+struct {
+  uint eax;
+  uint ebx;
+  uint ecx;
+  uint edx;
+  uint esi;
+  uint edi;
+  uint ebp;
+  uint esp;
+  uint eip;
+  ushort cs;
+  ushort ds;
+  ushort es;
+  ushort fs;
+  ushort gs;
+  ushort ss;
+  uint eflags;
+  uint cr0;
+  uint cr2;
+  uint cr3;
+  uint cr4;
+  uint stack0;
+  uint stack1;
+  uint stack2;
+  uint stack3;
+  uint stack4;
+} __attribute__((__packed__)) debug_info;
 
 void screen_actualizar_reloj_global()
 {
@@ -153,13 +182,79 @@ void print_dec(uint numero, int size, uint x, uint y, unsigned short attr)
     }
 }
 
+void screen_make_backup()
+{
+  uint i, j;
+  for(i = 0; i<VIDEO_FILS; i++){
+    for(j = 0; j<VIDEO_COLS; j++){
+      backup[i][j] = p[i][j];
+    }
+  }
+}
+
+void screen_restore_backup()
+{
+  uint i, j;
+  for(i = 0; i<VIDEO_FILS; i++){
+    for(j = 0; j<VIDEO_COLS; j++){
+      p[i][j] = backup[i][j];
+    }
+  }
+}
+
+void screen_pantalla_debug()
+{
+  uint x = 25, y = 7;
+
+  screen_pintar_rect(0, 0x00, y, x, 36, 32);
+  screen_pintar_rect(0, 0x77, y+1, x+1, 34, 30);
+  screen_pintar_rect(0, 0x44, y+1, x+1, 1, 30);
+
+
+  print("eax", x+2, y+3 , 0x70); print_hex(debug_info.eax, 8, x+6, y+3 , 0x7f);
+  print("ebx", x+2, y+5 , 0x70); print_hex(debug_info.ebx, 8, x+6, y+5 , 0x7f);
+  print("ecx", x+2, y+7 , 0x70); print_hex(debug_info.ecx, 8, x+6, y+7 , 0x7f);
+  print("edx", x+2, y+9 , 0x70); print_hex(debug_info.edx, 8, x+6, y+9 , 0x7f);
+  print("esi", x+2, y+11, 0x70); print_hex(debug_info.esi, 8, x+6, y+11, 0x7f);
+  print("edi", x+2, y+13, 0x70); print_hex(debug_info.edi, 8, x+6, y+13, 0x7f);
+  print("ebp", x+2, y+15, 0x70); print_hex(debug_info.ebp, 8, x+6, y+15, 0x7f);
+  print("esp", x+2, y+17, 0x70); print_hex(debug_info.esp, 8, x+6, y+17, 0x7f);
+  print("eip", x+2, y+19, 0x70); print_hex(debug_info.eip, 8, x+6, y+19, 0x7f);
+
+
+  print("cs", x+3, y+21, 0x70); print_hex(debug_info.cs, 4, x+6, y+21, 0x7f);
+  print("ds", x+3, y+23, 0x70); print_hex(debug_info.ds, 4, x+6, y+23, 0x7f);
+  print("es", x+3, y+25, 0x70); print_hex(debug_info.es, 4, x+6, y+25, 0x7f);
+  print("fs", x+3, y+27, 0x70); print_hex(debug_info.fs, 4, x+6, y+27, 0x7f);
+  print("gs", x+3, y+29, 0x70); print_hex(debug_info.gs, 4, x+6, y+29, 0x7f);
+  print("ss", x+3, y+31, 0x70); print_hex(debug_info.ss, 4, x+6, y+31, 0x7f);
+  
+  print("eflags", x+3, y+33, 0x70); print_hex(debug_info.eflags, 8, x+9, y+33, 0x7f);
+  
+  print("cr0", x+16, y+3, 0x70); print_hex(debug_info.cr0, 8, x+20, y+3, 0x7f);
+  print("cr2", x+16, y+5, 0x70); print_hex(debug_info.cr2, 8, x+20, y+5, 0x7f);
+  print("cr3", x+16, y+7, 0x70); print_hex(debug_info.cr3, 8, x+20, y+7, 0x7f);
+  print("cr4", x+16, y+9, 0x70); print_hex(debug_info.cr4, 8, x+20, y+9, 0x7f);
+
+  print("stack", x+16, y+20, 0x70); 
+  print_hex(debug_info.stack0, 8, x+16, y+22, 0x7f);
+  print_hex(debug_info.stack1, 8, x+16, y+23, 0x7f);
+  print_hex(debug_info.stack2, 8, x+16, y+24, 0x7f);
+  print_hex(debug_info.stack3, 8, x+16, y+25, 0x7f);
+  print_hex(debug_info.stack4, 8, x+16, y+26, 0x7f);
+
+}
+
 
 void screen_debug()
 {
+  screen_make_backup();
+  screen_pantalla_debug();
   while(modo_debug_activado)
   {
     ;
   }
+  screen_restore_backup();
 }
 
 
