@@ -40,29 +40,39 @@ void _isr70();
 
 
 
-void handler_teclado(uchar scan_code){
-	if(scan_code == 0x1e){
-    screen_pintar('a', 0x0f, 0, 79);
-  }
-  else if(scan_code == 0x2a){
-		screen_pintar('<', 0x0f, 0, 79);
-    game_atender_teclado('<'); 
-	}
-  else if(scan_code == 0x36){
-		screen_pintar('>', 0x0f, 0, 79);
-    game_atender_teclado('>');
-	}	
-  else if(scan_code == 0x15){
-		screen_pintar('y', 0x0f, 0, 79);
-    game_atender_teclado('y');
-  }
+void handler_teclado(uchar scan_code)
+{
+    switch (scan_code)
+    {
+        case 0x1e:
+            screen_pintar('a', 0x0f, 0, 79);
+            break;
+
+        case 0x2a:
+            screen_pintar('<', 0x0f, 0, 79);
+            game_atender_teclado('<'); 
+            break;
+
+        case 0x36:
+            screen_pintar('>', 0x0f, 0, 79);
+            game_atender_teclado('>');
+
+            break;
+
+        case 0x15:	
+            screen_pintar('y', 0x0f, 0, 79);
+            game_atender_teclado('y');
+            break;
+    }
 }
 
-void matar_tarea(){
+void matar_tarea()
+{
   game_pirata_exploto(id_del_pirata_actual); 
 }
 
-uint esta_pantalla_debug_activada(){
+uint esta_pantalla_debug_activada()
+{
   if(pantalla_debug_activada) return 1;
   else return 0;
 }
