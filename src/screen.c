@@ -274,6 +274,7 @@ void screen_debug()
     ;
   }
   screen_restore_backup();
+  modo_debug_activado = 1;
 }
 
 

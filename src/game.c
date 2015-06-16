@@ -23,18 +23,18 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 
 #define BOTINES_CANTIDAD 9
 
-/*uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
+uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {10, 2, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}
                                     };
-*/
 
+/*
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {10, 2, 50}, {5, 2, 50}, {15, 2, 50}, {20, 2, 50} ,
                                         {25,  2, 50}, {30, 2, 50}, {35, 2, 50}, {40, 2, 50},
                                         {45, 2, 50}
                                     };
-
+*/
 
 jugador_t jugadorA;
 jugador_t jugadorB;
@@ -538,6 +538,13 @@ void game_atender_teclado(unsigned char tecla)
     else if(tecla == 'y')
     { 
         modo_debug_activado = modo_debug_activado? 0: 1;
+        
+        if(modo_debug_activado){
+			print("MODO DEBUG ACTIVADO",55,0,0x0f0f);
+		} else{
+			screen_pintar_rect(0, 0x00, 0, 53, 1, 23);
+		}
+        
     }
 
 }
