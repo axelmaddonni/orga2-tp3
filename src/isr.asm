@@ -83,8 +83,6 @@ _isr%1:
   	mov eax, cr4
   	mov dword [debug_info + 64], eax
   	
-  	xchg bx, bx
-  	
   	mov eax, [esp]
   	mov dword [debug_info + 68], eax
   	mov eax, [esp+4]

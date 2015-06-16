@@ -21,8 +21,13 @@ void inicializar_minero()
 {
     pirata_t * pir = id_pirata2pirata(id_del_pirata_actual);
     jugador_t * jug = pir->jugador;
+    
+    uint hay_lugar = 0, i;
+    for(i = 0; i<MAX_CANT_PIRATAS_VIVOS; i++){
+		if(jug->vivos[i] == 0) hay_lugar = 1;
+	}
 
-    if(jug->mineros_pendientes.proximo_a_ejecutar < jug->mineros_pendientes.proximo_libre)
+    if(hay_lugar && jug->mineros_pendientes.proximo_a_ejecutar < jug->mineros_pendientes.proximo_libre)
     {
         uint x = jug->mineros_pendientes.ms[jug->mineros_pendientes.proximo_a_ejecutar].x_botin;
         uint y = jug->mineros_pendientes.ms[jug->mineros_pendientes.proximo_a_ejecutar].y_botin;

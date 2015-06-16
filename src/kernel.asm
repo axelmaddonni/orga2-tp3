@@ -36,7 +36,7 @@ extern tss_inicializar_tarea
 ;; SCHEDULER (EJERCICIO 7)
 extern game_inicializar
 extern testear_crear_tarea
-
+extern sched_inicializar
 
 ;; Saltear seccion de datos
 jmp start
@@ -121,6 +121,7 @@ modoprotegido:
     call screen_inicializar
 
     ; Inicializar el manejador de memoria
+    call inicializar_mmu
 
     ; Inicializar el directorio de paginas
     call mmu_inicializar_dir_kernel
@@ -135,7 +136,7 @@ modoprotegido:
     or eax, 0x80000000
     mov cr0, eax
 
-    call inicializar_mmu
+    
     
     
     ;;;; ESTO SE DEBE BORRAR DE LA  VERSION FINAL
@@ -153,10 +154,12 @@ modoprotegido:
     
     ; Inicializar tss de la tarea Idle
     ; call tss_inicializar_idle
+    ; no hace falta, se hace en tss_inicializar
 
 
     ; Inicializar el scheduler
-
+    call sched_inicializar
+    
     ; Inicializar la IDT
     call idt_inicializar
     ; Cargar IDT

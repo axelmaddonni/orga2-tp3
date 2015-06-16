@@ -21,12 +21,20 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 #define CANT_POSICIONES_VISTAS            9
 #define MAX_SIN_CAMBIOS                 999
 
-#define BOTINES_CANTIDAD 8
+#define BOTINES_CANTIDAD 9
 
-uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
+/*uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {10, 2, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {49, 38, 50}, {64, 21, 100}, {34, 21, 100}
                                     };
+*/
+
+uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
+                                        {10, 2, 50}, {5, 2, 50}, {15, 2, 50}, {20, 2, 50} ,
+                                        {25,  2, 50}, {30, 2, 50}, {35, 2, 50}, {40, 2, 50},
+                                        {45, 2, 50}
+                                    };
+
 
 jugador_t jugadorA;
 jugador_t jugadorB;
