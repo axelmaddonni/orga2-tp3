@@ -1,0 +1,12 @@
+\select@language {spanish}
+\contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{3}
+\contentsline {section}{\numberline {2}Desarrollo}{4}
+\contentsline {subsection}{\numberline {2.1}Ejercicio 1}{4}
+\contentsline {subsection}{\numberline {2.2}Ejercicio 2}{5}
+\contentsline {subsection}{\numberline {2.3}Ejercicio 3}{6}
+\contentsline {subsection}{\numberline {2.4}Ejercicio 4}{7}
+\contentsline {subsection}{\numberline {2.5}Ejercicio 5}{8}
+\contentsline {subsection}{\numberline {2.6}Ejercicio 6}{8}
+\contentsline {subsection}{\numberline {2.7}Ejercicio 7}{8}
+\contentsline {subsection}{\numberline {2.8}Ejercicio 8}{8}
+\contentsline {section}{\numberline {3}Conclusiones}{9}
