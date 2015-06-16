@@ -118,7 +118,7 @@ void screen_inicializar()
         screen_pintar('X', 0x01 , 48, 57+2*i);
     }
 
-	//print("Diablo II - Ciruelos / Maddonni / Thibeault", 0x0f0f, 0,0);
+	print("Diablo II - Ciruelos / Maddonni / Thibeault", 0,0, 0x0e);
 
 }
 

@@ -531,6 +531,7 @@ void game_atender_teclado(unsigned char tecla)
     { 
         modo_debug_activado = modo_debug_activado? 0: 1;
     }
+
 }
 
 void testear_crear_tarea()

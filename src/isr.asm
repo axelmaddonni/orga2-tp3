@@ -53,22 +53,48 @@ _isr%1:
     mov dword [debug_info + 24], ebp
     mov dword [debug_info + 28], esp
  
-	  mov eax, [esp+12] ; eip
-		mov dword [debug_info + 32], eax ;eip  \
+	mov eax, [esp+12] ; eip
+	mov dword [debug_info + 32], eax ;eip  \
 		
-		mov ax, cs
-		mov word [debug_info + 36], ax
-		mov ax, ds
-		mov word [debug_info + 38], ax
-		mov ax, es
-		mov word [debug_info + 40], ax
-		mov ax, fs
-		mov word [debug_info + 42], ax
-		mov ax, gs
-		mov word [debug_info + 44], ax
-		mov ax, ss
-		mov word [debug_info + 46], ax
-
+	mov ax, cs
+	mov word [debug_info + 36], ax
+	mov ax, ds
+	mov word [debug_info + 38], ax
+	mov ax, es
+	mov word [debug_info + 40], ax
+	mov ax, fs
+	mov word [debug_info + 42], ax
+	mov ax, gs
+	mov word [debug_info + 44], ax
+	mov ax, ss
+	mov word [debug_info + 46], ax
+    
+    xor eax, eax
+    pushf    ; obtenemos el registro
+    pop ax   ; eflags
+    mov dword [debug_info + 48], eax
+    
+    mov eax, cr0
+  	mov dword [debug_info + 52], eax
+  	mov eax, cr2
+  	mov dword [debug_info + 56], eax
+  	mov eax, cr3
+  	mov dword [debug_info + 60], eax
+  	mov eax, cr4
+  	mov dword [debug_info + 64], eax
+  	
+  	xchg bx, bx
+  	
+  	mov eax, [esp]
+  	mov dword [debug_info + 68], eax
+  	mov eax, [esp+4]
+  	mov dword [debug_info + 72], eax
+  	mov eax, [esp+8]
+  	mov dword [debug_info + 76], eax
+  	mov eax, [esp+12]
+  	mov dword [debug_info + 80], eax
+    mov eax, [esp+16]
+  	mov dword [debug_info + 84], eax
 
 
     sti
@@ -197,11 +223,8 @@ _isr70:
   call game_syscall_manejar
   add esp, 8
 
-  ;xchg bx, bx
   jmp 0x70:0 ;voy a idle
  
-  ;xchg bx, bx
-  
   popfd
   pop edi
   pop esi
@@ -210,8 +233,6 @@ _isr70:
   pop ebx
   pop edx
   pop ecx
-  
-  xchg bx, bx
   
   iret
 
