@@ -44,15 +44,34 @@ global _isr70
 
 	
 _isr%1:
-    mov [debug_info + 00], eax
-    mov [debug_info + 04], ebx
-    mov [debug_info + 08], ecx
-    mov [debug_info + 12], edx
-    mov [debug_info + 16], esi
-    mov [debug_info + 20], edi
-    mov [debug_info + 24], ebp
-    mov [debug_info + 28], esp
-    ;mov [debug_info + 32], eip
+    xchg bx, bx
+    mov dword [debug_info + 00], eax
+    mov dword [debug_info + 04], ebx
+    mov dword [debug_info + 08], ecx
+    mov dword [debug_info + 12], edx
+    mov dword [debug_info + 16], esi
+    mov dword [debug_info + 20], edi
+    mov dword [debug_info + 24], ebp
+    mov dword [debug_info + 28], esp
+ 
+	  mov eax, [esp+12] ; eip
+		mov dword [debug_info + 32], eax ;eip  \
+		
+		mov ax, cs
+		mov word [debug_info + 36], ax
+		mov ax, ds
+		mov word [debug_info + 38], ax
+		mov ax, es
+		mov word [debug_info + 40], ax
+		mov ax, fs
+		mov word [debug_info + 42], ax
+		mov ax, gs
+		mov word [debug_info + 44], ax
+		mov ax, ss
+		mov word [debug_info + 46], ax
+
+
+
     sti
     call matar_tarea
     jmp 0x70:0 ;voy a idle
