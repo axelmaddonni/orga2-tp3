@@ -57,6 +57,7 @@ void screen_pintar_relojes();
 void screen_actualizar_posicion_mapa(uint x, uint y);
 void screen_stop_game_show_winner(jugador_t *j);
 
+void screen_pintar_puerto(jugador_t * j);
 void screen_debug();
 
 #endif  /* !__SCREEN_H__ */

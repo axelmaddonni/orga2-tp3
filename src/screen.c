@@ -182,6 +182,23 @@ void print_dec(uint numero, int size, uint x, uint y, unsigned short attr)
     }
 }
 
+void screen_pintar_puerto(jugador_t * j)
+{
+    uint x = j->puerto[0], y = j->puerto[1];
+
+    uchar c = j->color;
+    if(p[y  ][x-1].a != c) screen_pintar_rect(0, c, y  , x-1, 1, 1);
+    if(p[y+1][x-1].a != c) screen_pintar_rect(0, c, y+1, x-1, 1, 1);
+    if(p[y+2][x-1].a != c) screen_pintar_rect(0, c, y+2, x-1, 1, 1);
+    if(p[y  ][x  ].a != c) screen_pintar_rect(0, c, y  , x  , 1, 1);
+    if(p[y+1][x  ].a != c) screen_pintar_rect(0, c, y+1, x  , 1, 1);
+    if(p[y+2][x  ].a != c) screen_pintar_rect(0, c, y+2, x  , 1, 1);
+    if(p[y  ][x+1].a != c) screen_pintar_rect(0, c, y  , x+1, 1, 1);
+    if(p[y+2][x+1].a != c) screen_pintar_rect(0, c, y+1, x+1, 1, 1);
+    if(p[y+2][x+1].a != c) screen_pintar_rect(0, c, y+2, x+1, 1, 1);
+}
+
+
 void screen_make_backup()
 {
   uint i, j;

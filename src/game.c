@@ -175,6 +175,7 @@ void game_pirata_inicializar(jugador_t *jugador, tipo_t tipo, uint xparam, uint 
 
         tss_inicializar_tarea(pir->index, jugador->jug, cr3);
         screen_actualizar_reloj_pirata(jugador, pir);
+        screen_pintar_puerto(jugador);
         //si es minero, encolar
         //ESTO ESTA HACIENDO ALGO TURBIO AUNQUE NO DEBERIA...
         /*if(tipo == MINERO)
@@ -303,8 +304,21 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
 
     if(pir->tipo == EXPLORADOR)
     {
-
         uint i, h;
+
+        // pintar pantalla
+        for(i = 0; i<3; i++)
+        {
+            for(h = 0; h<3; h++)
+            {
+                if(en_rango(explorado_x[i], explorado_y[h]) && jug->posiciones_exploradas[explorado_y[h]][explorado_x[i]] == 0)
+                {
+                    screen_pintar_rect(0, jug->color, explorado_y[h]+1, explorado_x[i], 1, 1);
+                }
+            }
+        }
+
+       
         for(i = 0; i<3; i++)
         {
             for(h = 0; h<3; h++)
@@ -314,6 +328,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
                     //si hay un botin con monedas
                     if(game_valor_tesoro(explorado_x[h], explorado_y[i]) && jug->posiciones_exploradas[explorado_y[i]][explorado_x[h]] == 0)
                     {    
+                        screen_pintar_rect('o', jug->color, explorado_y[i]+1, explorado_x[h], 1, 1); //no se porque va el +1
                         //lanzo minero
                         game_lanzar_minero(jug, explorado_x[h], explorado_y[i]); 
                     }
@@ -342,28 +357,17 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
             }
         }
 
-        // pintar pantalla
-        for(i = 0; i<3; i++)
-        {
-            for(h = 0; h<3; h++)
-            {
-                if(en_rango(explorado_x[i], explorado_y[h]))
-                {
-                    screen_pintar_rect(0, jug->color, explorado_y[h]+1, explorado_x[i], 1, 1);
-                }
-            }
-        }
     }
 
 
     if(pir->tipo == EXPLORADOR)
     {
-        screen_pintar_rect('E', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
+        screen_pintar_rect('E', jug->jug == A? 0x4f : 0x1f, pir->posicion[1]+1, pir->posicion[0], 1, 1);
         screen_pintar_rect('E', jug->color, y_viejo+1, x_viejo, 1, 1);
     }
     else
     {
-        screen_pintar_rect('M', jug->color, pir->posicion[1]+1, pir->posicion[0], 1, 1);
+        screen_pintar_rect('M', jug->jug == A? 0x4f : 0x0f , pir->posicion[1]+1, pir->posicion[0], 1, 1);
         screen_pintar_rect('M', jug->color, y_viejo+1, x_viejo, 1, 1);
     }
 
@@ -531,7 +535,8 @@ void testear_crear_tarea()
         pir->cr3 = (uint) cr3;
 
         tss_inicializar_tarea(pir->index, A, cr3);
-        id_del_pirata_actual = pir->id_pirata; 
+        id_del_pirata_actual = pir->id_pirata;
+
     }
 }
 
