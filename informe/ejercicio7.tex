@@ -3,9 +3,17 @@
 \subsubsection*{Estructuras del scheduler}
  
 La estructura en la que almacenamos los datos necesarios para la conmutación de tareas es muy simple. Básicamente son 3 datos
- 
-% aca deberia ir el codigo de sched_struct 
- 
+
+\begin{lstlisting}
+struct {
+  uint indiceA;
+  uint indiceB;
+
+  cual_t proximo;
+} sched_struct;
+\end{lstlisting}
+
+
 \texttt{indiceA} nos indica cual es el próximo índice en el que deberíamos comenzar a buscar una nueva tarea para ejecutar del jugador A (similarmente \texttt{indiceB}). Notar que este índice puede corresponderse con una tarea válida del jugador tanto como con una tarea muerta o inválida.
  
 \texttt{proximo}, nos indica a que jugador le toca jugar, es decir, en que arreglo de tareas vamos a comenzar nuestra búsqueda.
