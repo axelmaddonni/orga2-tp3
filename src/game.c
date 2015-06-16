@@ -462,6 +462,13 @@ uint game_syscall_manejar(uint syscall, uint param1)
 void game_pirata_exploto(uint id)
 {
     pirata_t * pir = id_pirata2pirata(id);
+
+    uint x = pir->posicion[0];
+    uint y = pir->posicion[1];
+
+    screen_pintar('X', (pir->jugador)->color, y + 1, x);
+    //void screen_pintar(unsigned char c, unsigned char color, uint fila, uint columna);
+
     pir->jugador->vivos[pir->index] = 0;
 
     if(modo_debug_activado)
