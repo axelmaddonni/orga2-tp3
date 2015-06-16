@@ -103,7 +103,7 @@ void tss_inicializar()
         tss_jugadorA[i].ss = 0x5b;
         tss_jugadorA[i].fs = 0x5b;
 
-        tss_jugadorA[i].eflags = 0x002;
+        tss_jugadorA[i].eflags = 0x202;
         tss_jugadorA[i].iomap = 0xFFFF;
 
         //15 es la proxima entrada vacia en la GDT
@@ -135,7 +135,7 @@ void tss_inicializar()
         tss_jugadorB[i].ss = 0x5b;
         tss_jugadorB[i].fs = 0x5b;
 
-        tss_jugadorB[i].eflags = 0x002;
+        tss_jugadorB[i].eflags = 0x202;
         tss_jugadorB[i].iomap = 0xFFFF;
 
         //15 es la proxima entrada vacia en la GDT
@@ -175,7 +175,7 @@ void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo)
         tss_jugadorA[i].ss = 0x5b;
         tss_jugadorA[i].fs = 0x5b;
 
-        tss_jugadorA[i].eflags = 0x002;
+        tss_jugadorA[i].eflags = 0x202;
         tss_jugadorA[i].iomap = 0xFFFF;
 
         tss_jugadorA[i].edi = 0x0;
@@ -203,7 +203,7 @@ void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo)
         tss_jugadorB[i].ss = 0x5b;
         tss_jugadorB[i].fs = 0x5b;
 
-        tss_jugadorB[i].eflags = 0x002;
+        tss_jugadorB[i].eflags = 0x202;
         tss_jugadorB[i].iomap = 0xFFFF;
 
         tss_jugadorB[i].edi = 0x0;
