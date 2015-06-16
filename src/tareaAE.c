@@ -19,8 +19,11 @@ void task(int x, int y) {
     {
         
         int i;
-        for (i = 0; i < restantex; i++)
+        for (i = 0; i < restantex; i++){
+            breakpoint();
             syscall_mover(DER);
+            breakpoint();
+		}
 
         restantex = restantex - 3;
 

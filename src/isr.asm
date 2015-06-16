@@ -44,7 +44,6 @@ global _isr70
 
 	
 _isr%1:
-    xchg bx, bx
     mov dword [debug_info + 00], eax
     mov dword [debug_info + 04], ebx
     mov dword [debug_info + 08], ecx
@@ -198,8 +197,11 @@ _isr70:
   call game_syscall_manejar
   add esp, 8
 
+  ;xchg bx, bx
   jmp 0x70:0 ;voy a idle
  
+  ;xchg bx, bx
+  
   popfd
   pop edi
   pop esi
@@ -208,6 +210,8 @@ _isr70:
   pop ebx
   pop edx
   pop ecx
+  
+  xchg bx, bx
   
   iret
 
