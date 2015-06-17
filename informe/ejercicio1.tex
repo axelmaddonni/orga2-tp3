@@ -20,7 +20,6 @@ Para las tss, el límite es 0x68, pues miden 104 bytes cada una. Como base de la
 \par Para pasar a modo protegido, completamos y cargamos la GDT usando la instrucción lgdt, que toma el descriptor de la GDT con el tamaño y la dirección de la misma, habilitamos A20 para habilitar el acceso a direcciones superiores a los 2$^{20}$ bits, seteamos el bit de PE del registro CR0, y saltamos a 0x40:modoprotegido donde el 0x40 corresponde al Indice del segmento de código de nivel 0 (índice 8 en la gdt), corrido 3 ceros (estos ceros son los del TI y RPL).
 
 \begin{lstlisting} [caption={Pasaje a modo protegido},label=modoproteg]
-    
     ; Habilitar A20
     call habilitar_A20  
    
@@ -34,32 +33,27 @@ Para las tss, el límite es 0x68, pues miden 104 bytes cada una. Como base de la
 
     ; Saltar a modo protegido
 	jmp 0x40:modoprotegido
-
 \end{lstlisting}
 
-\newpage
 
 \par Una vez trabajando en modo protegido, procedemos a establecer los selectores de segmentos de datos de nivel 0 (indice 9 en la gdt, corrido tres ceros correspondientes a los bits de TI y RPL), y el selector de segmento de video en fs (indice 12 en la gdt). Luego establecemos la base de la pila en la dirección 0x27000.
 
 
 \begin{lstlisting} [caption={Pasaje a modo protegido},label=modoproteg2]
     modoprotegido:
-    
-    ; Establecer selectores de segmentos
+    ;Establecer selectores de segmentos
     xor eax, eax
 	mov ax,  1001000b
 	mov ds, ax
 	mov es, ax
 	mov gs, ax
 	mov ss, ax
-    
-	mov ax, 1100000b
+    	mov ax, 1100000b
     mov fs, ax
 
     ; Establecer la base de la pila
 	mov ebp, 0x27000
 	mov esp, 0x27000
-
 \end{lstlisting}
 
 \subsubsection*{Inicialización de la Pantalla}
