@@ -1,0 +1,63 @@
+
+
+\subsubsection*{TSS}
+
+Los TSS (task state segment) son una parte vital en el manejo de tareas. Ellas se ocupan de guardar el información sobre una determinada tarea, más precisamente, el contexto de ejecución que tenía una determinada tarea cuando el procesador cortó su ejecución.
+
+\subsubsection*{Entradas de la GDT}
+
+Las TSS, como todo segmento, tienen un descriptor que se declara en la TSS. En nuestro caso necesitaremos bastantes descriptores. Primero, uno para la tarea inicial (explicaremos más adelante que es esto), otro para la tarea idle, y luego 8 para cada jugador, es decir, en total declaramos 18 descriptores de TSS en la GDT.
+
+La tarea inicial es un placeholder que debe llenarse antes de empezar a trabajar con tareas. Esto se debe a que cuando saltemos a nuestra primera tarea, el procesador intentará guardar el contexto de ejecución de la tarea que está corriendo actualmente, y si no declaramos un descriptor de segmento ad-hoc para esa tarea, todo va a explotar.
+
+Veamos como deben ser inicializadas las TSS de las tareas.
+
+La TSS de la tarea inicial puede ser inicializada con fruta, porque es un contexto que nunca vamos a retomar, como bien explicamos antes.
+
+Para la tarea idle, es bastante straightforward todo, se debe inicializar todo en nivel kernel (la pila y los segmentos de codigo y datos son de kernel), ademas de poner el eip donde corresponde (al inicio del código de la tarea).
+
+Para las tareas de los piratas, explicitamos el código a continuacion (caso jugador A):
+
+\begin{lstlisting}
+void tss_inicializar_tarea(uint indice_tarea, cual_t jugador, pde * cr3_nuevo)
+{
+  (...)
+
+  tss_jugadorA[i].cs = 0x53;
+  tss_jugadorA[i].ds = 0x5b;
+  tss_jugadorA[i].es = 0x5b;
+  tss_jugadorA[i].gs = 0x5b;
+  tss_jugadorA[i].ss = 0x5b;
+  tss_jugadorA[i].fs = 0x5b;
+
+  tss_jugadorA[i].eflags = 0x202;
+  tss_jugadorA[i].iomap = 0xFFFF;
+
+  (...)  
+
+  tss_jugadorA[i].esp = 0x0401000 - 12; 
+  tss_jugadorA[i].ebp = 0x0401000 - 12; 
+
+  tss_jugadorA[i].eip = 0x00400000;
+  tss_jugadorA[i].esp0 = (unsigned int) dar_siguiente() + 0x1000;
+  tss_jugadorA[i].ss0 = 0x48;  
+
+  tss_jugadorA[i].cr3 = (uint) cr3_nuevo;
+  (...) 
+}
+\end{lstlisting}
+
+
+
+Veamos de donde salen todos esos números. El 0x53 y el 0x5b salen de que 10 y 11 son las entradas de la GDT de los segmentos de código y datos0 de nivel 3 respectivamente, entonces $10 << 3 | 0x3 = 0x53$, y similarmente para 0x5b.
+
+
+
+Por otro lado, la pila se inicializa en 0x0401000 - 12, dado que el final del código de la tarea va a estar en 0x0401000, pero va a tener apilada 3 cosas, los dos parámetros y su dirección de retorno, a lo que se debe el -12. El EBP podría inicializarse en cualquier cosa, todo da lo mismo, dado que la tarea nunca va a retornar (por la misma razón la dirección de retorno puede ser cualquiera).
+
+
+La ultima cosa importante a notar es que la pila de nivel 0 se inicializar en dar_siguiente() + 0x1000, porque cada tarea debe tener una pila de nivel 0 distinta, y ademas el esp debe apuntar al final de ese lugar (si no al pushear cosas va a pisar la página anterior y eso está mal).
+
+Esta función se divide muchas funcionalidades con \texttt{mmu_inicializar_dir_pirata}, por lo tanto, para terminar de entender bien como es el proceso de inicialización de una tarea, deben entenderse bien ambas funciones, dado que son la parte más importante de este proceso.
+
+
