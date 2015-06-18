@@ -384,7 +384,7 @@ uint game_syscall_pirata_mover(uint id, direccion dir)
     mmu_mapear_pagina(0x400000, (pde *) pir->cr3, 0x500000+indice_nuevo, 1, 1);
     //copiamos el codigo la pagina actual
     copiar_pagina(0x800000+indice_viejo, 0x400000);	
-
+    mmu_mapear_pagina(0x800000+indice_viejo, (pde *) pir->cr3, 0x500000+indice_nuevo, 0, 1);
     return 1;
 }
 
