@@ -21,7 +21,6 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 #define CANT_POSICIONES_VISTAS            9
 #define MAX_SIN_CAMBIOS                 999
 
-#define BOTINES_CANTIDAD 9
 
 uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {10, 2, 50}, {30, 38, 50}, {15, 21, 100}, {45, 21, 100} ,

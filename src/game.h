@@ -20,6 +20,7 @@ typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion
 #define MAPA_ANCHO                       80
 #define MAPA_ALTO                        44
 
+#define BOTINES_CANTIDAD 9
 
 struct jugador_t;
 
@@ -66,7 +67,7 @@ typedef struct jugador_t
     uchar color;
 
     struct {
-      minero_obj ms[10]; //cabeza
+      minero_obj ms[2*BOTINES_CANTIDAD];
       uint proximo_a_ejecutar;
       uint proximo_libre;
       
