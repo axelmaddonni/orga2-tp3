@@ -1,1 +1,73 @@
 \subsubsection*{Estructuras del juego}
+
+Analicemos ahora las estructuras que utilizamos para llevar a cabo el juego.
+
+
+\begin{lstlisting}
+typedef struct pirata_t
+{
+    uint index;
+    struct jugador_t *jugador;
+    
+    tipo_t tipo;
+    
+    uint id_pirata;
+    uint posicion[2];
+    
+    uint cr3;
+
+    uint estado_reloj;
+
+} pirata_t;
+\end{lstlisting}
+
+\texttt{index} es el indice del arreglo de jugadores del jugador al que corresponde este pirata y \texttt{jugador} es un puntero al jugador correspondiente.
+
+\texttt{tipo} es MINERO o EXPLORADOR e indica de que tipo es el pirata.
+
+\texttt{id_pirata} es la id unica del pirata (y de la tarea), mientras que \texttt{posicion} es su ubicación dentro del juego.
+
+\texttt{cr3} es el cr3 de la tarea. Lo vamos a usar cuando algun pirata explorador descubra nuevos lugares, dado que necesitamos mapearle esas nuevas páginas a todos los jugadores del juego.
+
+\texttt{estado_reloj} nos va a permitir saber cual es el estado del reloj de ese jugador para poder ir girandolo (ver screen.h).
+
+
+\begin{lstlisting}
+typedef struct jugador_t
+{
+    cual_t jug;
+    
+    pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
+    uchar vivos[MAX_CANT_PIRATAS_VIVOS];
+    
+    uchar color;
+
+    struct {
+      minero_obj ms[10]; 
+      uint proximo_a_ejecutar;
+      uint proximo_libre;
+      
+    } mineros_pendientes;
+ 
+    uint monedas;
+  
+    uchar posiciones_exploradas[MAPA_ALTO][MAPA_ANCHO];
+    int puerto[2];   
+} jugador_t;
+\end{lstlisting}
+
+\texttt{jug} puede valer A (0) o B (1), y nos indica que jugador es este.
+
+\texttt{piratas} y \texttt{vivos} son dos arreglos que nos indican (para cada uno de los 8 piratas que podemos lanzar en total), la información del pirata (como vimos antes) y si ese pirata esta vivo o no. Si no está vivo vamos a poder lanzar nuevos piratas y reutilizar ese slot.
+
+\texttt{color} es el color del cual se tiene que imprimir el fondo de la pantalla cuando un pirata de ese jugador se mueva.
+
+\texttt{mineros_pendientes} es una estructura que contiene un arreglo de mineros, y nos permite saber cuantos quedan por ejecutar.
+
+\texttt{monedas} son la cantidad de monedas que tiene el jugador en un momento dado.
+
+\texttt{posiciones_exploradas} es una matriz que nos permite saber que posiciones exploró y cuales no el jugador.
+
+\texttt{puerto} son las coordenadas del puerto del jugador.
+
+
