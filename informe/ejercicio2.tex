@@ -7,8 +7,10 @@
 de la interrupci\'on correspondiente. El selector de segmento lo define como 0x0040, que es 0x8 (el indice del segmento de codigo de nivel de privilegio 0 en la GDT) shifteado 3 bits a la izquierda.
 Los atributos los define como 0x8e00, que representan un segmento presente (P = 1), un nivel de privilegio de 0 (DPL = 00), un tama\~no de Gate de 32 bits (bits 8 a 12 de la Interrupt Gate = 0b01110),
 y los 7 bits restantes en 0. 
+\par Cabe destacar la entrada de la IDT correspondiente a la interrupci\'on 0x46 (correspondiente a las \textit{syscalls}), que se inicializa de la forma detallada en el extracto de c\'odigo \ref{0x46}
+. La \'unica diferencia entre esta entrada y la definida por el macro previamente mencionado son los atributos, puntualmente el DPL (3 en esta entrada y 0 en las otras); esta diferencia se debe a que la \textit{syscall} debe poder ser llamada por las tareas, mientras que las otras interrupciones deben estar reservadas al nivel m\'as privilegiado.
 \par La rutina de atenci\'on de cada interrupci\'on se genera a partir de un macro (que se encuentra en el extracto de C\'odigo \ref{macroISR}) que imprime el c\'odigo de error correspondiente
-a pantalla y luego queda en un loop infinito.
+a pantalla y luego queda en un loop infinito (esta rutina es un placeholder, que luego ser\'a reemplazada por una que mate a la tarea que causa la interrupci\'on y llame a la idle).
 \par La IDT ya inicializada se puede acceder tras ejecutar la instrucci\'on $lidt [IDT\_DESC]$. El descriptor de la IDT, "IDT\_DESC" es una estructura (definida como se ve en el extracto de
 c\'odigo \ref{idtDesc}) que contiene el tama\~no de la IDT y su direcci\'on en memoria.
 
@@ -49,3 +51,13 @@ typedef struct str_idt_descriptor {
     unsigned int    idt_addr;
 } __attribute__((__packed__)) idt_descriptor;
 \end{lstlisting}
+
+\begin{lstlisting} [caption={Codigo de la entrada de IDT de int 0x46},label=0x46]
+#define IDT_ENTRY(numero)                                                                                        
+    idt[numero].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## numero) & (unsigned int) 0xFFFF);        
+    idt[numero].segsel = (unsigned short) 0x0040;                                                                
+    idt[numero].attr = (unsigned short) 0xee00;                                                                  
+    idt[numero].offset_16_31 = (unsigned short) ((unsigned int)(&_isr ## numero) >> 16 & (unsigned int) 0xFFFF);
+\end{lstlisting}
+
+

@@ -1,0 +1,126 @@
+\subsubsection*{Syscalls}
+\par Los sistemas operativos proveen servicios (en la forma de \textit{system calls}, o \textit{syscalls}) para que sus tareas puedan realizar ciertas acciones que de otra forma no podr\'ian. En este caso, nuestro sistema operativo consta con una sola \textit{syscall}, mapeada a la interrupci\'on 0x46, que realizar\'a distintas acciones basado en el par\'ametro que se pase por el registro EAX.
+Las tres acciones que la \textit{syscall} permite realizar a las tareas son:
+\begin{itemize}
+    \item Moverse (EAX = 0x1)
+    \item Cavar (EAX = 0x2)
+    \item Preguntar su posici\'on (EAX = 0x3)
+\end{itemize}
+
+\subsubsection*{Rutina de atenci\'on de interrupciones}
+\par Las tareas deben realizar una interrupci\'on, int 0x46, para acceder a los servicios de la \textit{syscall}; en el registro EAX deben pasar el tipo de servicio requerido (0x1 para moverse, 0x2 para cavar y 0x3 para pedir su posici\'on), y en ECX el par\'ametro del servicio (mover y posici\'on toman un par\'ametro adicional).
+La rutina de atenci\'on de la interrupci\'on (cuyo c\'odigo se puede ver en el extracto \ref{int}) 0x46 (70 en decimal) pushea los registros necesarios y llama a la funci\'on (implementada en lenguaje C) "game\_syscall\_manejar", y luego salta a la tarea idle mediante un jump far 0x70:0. Esta funci\'on llama a otras, que corresponden a cada servicio, con los par\'ametros necesarios; si el \textit{syscall} devuelve un error (resultado ~0, es decir la negaci\'on l\'ogica de 0x0, el mayor resultado posible en un entero sin signo), se ocupa de llamar a la funci\'on que lo resuelva.
+
+\begin{lstlisting} [caption={Rutina de atenci\'on de la interrupci\'on 0x46},label=int]
+_isr70:
+  push ecx
+  push edx
+  push ebx
+  push esp
+  push ebp
+  push esi
+  push edi
+  pushfd
+  
+  push ecx
+  push eax
+  call game_syscall_manejar
+  add esp, 8
+
+  jmp 0x70:0 ;voy a idle
+ 
+  popfd
+  pop edi
+  pop esi
+  pop ebp
+  pop esp
+  pop ebx
+  pop edx
+  pop ecx
+  
+  iret
+
+\end{lstlisting}
+
+
+
+\subsubsection*{Mover}
+\par La funci\'on "game_syscall_pirata_mover" toma como par\'ametros la id del pirata que se quiere mover, y uno de cuatro valores posibles que representan la direcci\'on en la cual desea moverse. 
+Convierte la id en un puntero al pirata mediante la funci\'on "id_pirata2pirata", y guarda su posici\'on; si el puntero que devuelve es nulo (ya que la id no corresponde a un pirata v\'alido), devuelve un error.
+Si el pirata est\'a intentando moverse fuera del mapa, devuelve un error, en caso contrario actualiza su posici\'on.
+Luego, genera dos arreglos, de tama\~no 3 cada uno, con el componente x e y de las posiciones de mapa que descubrir\'a al moverse (de forma que el producto cartesiano de los dos arreglos provee todas las posiciones que va a descubrir).
+En caso de ser un explorador, se pintan (del color del jugador) las posiciones previamente inexploradas que fueron descubiertas en ese movimiento; adicionalmente, si se descubre un bot\'in con monedas, se pinta una 'o' del color del jugador que lo descubri\'o, y se lanza (o encola, si no hay lugar para otro pirata de ese jugador) un minero.
+Luego, se mapean para cada pirata las p\'aginas de memoria correspondientes a las posiciones reci\'en exploradas (como se ve en el extracto de c\'odigo \ref{mapeo}).
+Adicionalmente, se pinta en pantalla la nueva posici\'on. Finalmente, se mapea la posici\'on fisica correspondiente a la nueva posici\'on del pirata a la direcci\'on virtual 0x400000, y se copia el c\'odigo de la tarea a \'esta (como se ve en el extracto de c\'odigo \ref{copiado}).
+
+
+
+\begin{lstlisting} [caption={Mapeo de las posiciones de memoria reci\'en descubiertas},label=mapeo]
+
+
+uint p;
+for(p = 0; p<MAX_CANT_PIRATAS_VIVOS; p++)
+{
+    if(jug->vivos[p])
+    {
+        for(i = 0; i<3; i++)
+        {
+            for(h = 0; h<3; h++)
+            {			
+                if(en_rango(explorado_x[i], explorado_y[h]))
+                {
+                    uint ind = (explorado_y[h]*MAPA_ANCHO+explorado_x[i]) * 0x1000;
+                    mmu_mapear_pagina(0x800000+ind, (pde *) jug->piratas[p].cr3, 0x500000+ind, 0, 1);
+                }
+            }
+        }
+    }
+}
+
+\end{lstlisting}
+
+
+\begin{lstlisting} [caption={Mapeo de y copiado a la posici\'on actual},label=copiado]    
+
+uint indice_viejo = (y_viejo*MAPA_ANCHO+x_viejo) * 0x1000;                                
+uint indice_nuevo = (pir->posicion[1]*MAPA_ANCHO+pir->posicion[0]) * 0x1000;          
+                                                                                          
+mmu_mapear_pagina(0x400000, (pde *) pir->cr3, 0x500000+indice_nuevo, 1, 1);               
+copiar_pagina(0x800000+indice_viejo, 0x400000);	
+
+\end{lstlisting}
+
+\subsubsection*{Cavar}
+\par La funci\'on "game_syscall_cavar" recupera el puntero al pirata a partir de su id (y devuelve un error si el puntero es nulo o apunta a un explorador).
+Luego recorre el arreglo de botines (como se ve en el extracto de c\'odigo \ref{cavar}) y, de encontrarse uno en la misma posici\'on que el minero, aumenta en uno el puntaje del jugador y decrementa, tambi\'en en uno, la cantidad de monedas en el bot\'in.
+Si la cantidad de monedas en el bot\'in es menor o igual a 0, o si no hay ning\'un bot\'in en la posici\'on en la que esta intentando cavar, devuelve un error.
+Devuelve un entero sin signo que representa la cantidad de monedas que quedan en el bot\'in.
+
+\begin{lstlisting} [caption={Extracci\'on de monedas del bot\'in},label=cavar]
+
+uint i;
+for (i = 0; i < BOTINES_CANTIDAD; i++)
+{
+    if (x == botines[i][0] && y == botines[i][1])
+    {
+        if (botines[i][2] > 0) 
+        {
+            (pir->jugador)->monedas++;
+            screen_pintar_puntajes();
+            return --botines[i][2];
+        }
+        else return ~0;
+    }
+}
+
+\end{lstlisting}
+
+
+\subsubsection*{Posici\'on}
+\par La funci\'on "game_syscall_pirata_posicion" devuelve la posici\'on del pirata que causa la interrupci\'on (si el \'indice de entrada es -1) o del pirata que se encuentre en la \'indice-i\'esima posici\'on del arreglo de piratas del jugador. Devuelve error si la id no pertenece a un pirata v\'alido (es decir si "id_pirata2pirata" devuelve null), si el \'indice no pertenece al rango [-1, 7], o si el \'indice no corresponde a un pirata vivo. La posici\'on la devuelve como un solo entero sin signo, resultado de la expresi\'on detallada en el extracto de c\'odigo \ref{posicion}.
+
+\begin{lstlisting} [caption={Devolver la posici\'on},label=posicion]
+
+return (y << 8 | x);
+
+\end{lstlisting}
