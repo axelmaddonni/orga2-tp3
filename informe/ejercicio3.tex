@@ -1,0 +1,18 @@
+\subsubsection*{Inicialización de de directorio y tablas de kernel}
+
+\par Para inicializar el directorio del kernel, lo que hacemos es, en la primera posición declarar la tabla de kernel (que será identity mapping), y luego ponemos todo el resto de directorio en 0 (bit de presente en 0, que indica que esas entradas no direccionan nada).
+
+\par Luego inicializamos la tabla de kernel, que está en identity mapping, como dijimos anteriormente. Eso es bastante fácil, ya que podemos usar la misma variable para iterar y para decir la dirección física a la que direccionará una dirección virtual.
+
+\subsubsection*{Activación de Paginación}
+
+\par Para habilitar paginación, una vez inicializado correctamente el mmu, activamos el bit de PE del registro cr0:
+\begin{lstlisting} [caption={Paginación en kernel.asm}],label=paginacion] 
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
+\end{lstlisting}
+    
+\subsubsection*{Imprimir en pantalla}
+
+\par Para pintar la pantalla usamos las funciones que nos permiten pintar rectángulos, que no necesitan explicación dado que son muy simples. (más de screen.h en funciones auxiliares)

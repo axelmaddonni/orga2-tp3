@@ -1,0 +1,37 @@
+	\subsubsection*{Interrupción de Reloj}
+
+\par La rutina asociada a la interrupción de reloj (_isr32 en el archivo isr.asm) se encarga de llamar a \texttt{sched_tick}, y en caso de que la pantalla de error del modo debug no esté activa, saltar a la próxima tarea.
+\par Para ello, primero guardamos los registros usando las instrucciones \texttt{pushad} y \texttt{pushfd} y comunicamos al PIC que ya se atendió la interrupción usando call \texttt{fin_intr_pic1}. Usamos una función auxiliar \texttt{esta_pantalla_debug_activada}, para ver si la pantalla de error está activa. Si está activa, la rutina simplemente, salta al final y restaura los registros. De lo contrario, llama a la función \texttt{sched_tick}.
+\par \texttt{sched_tick} se encarga de llamar a \texttt{game_tick} (que actualiza el reloj de la pantalla), y devuelve el selector de segmento correspondiente a la próxima tarea a saltar. Una vez llamada la función, vemos si esta tarea no es la que está corriendo actualmente comparándolo con el TR actual, y en caso necesario salta a dicha tarea:
+
+\begin{lstlisting} [caption={Cambio de tarea}],label=isrreloj] 
+offset: dd 0
+selector: dw 0
+
+  call sched_tick
+  
+  str cx
+  cmp ax, cx
+  je .fin
+    mov [selector], ax
+   jmp far [offset]
+\end{lstlisting}
+
+	\subsubsection*{Interrupción de Teclado}
+
+\par La rutina asociada a la interrupción de teclado (_isr33 en isr.asm) se encarga de obtener la tecla presionada usando  \texttt{in al, 0x60} y pasárle el scan code por parámetro a la función \texttt{handler_teclado} definida en isr.h. (Al igual que la interrupción de reloj, guarda y restaura los registros, y avisa al pic que la interrupción fue atendida).
+\par La función \texttt{handler_teclado}, recibe el scan code, y en caso que la tecla presionada sea LSHIFT o RSHIFT pinta < o > en el extremo superior derecho de la pantalla, y llama a \texttt{game_atender_teclado} para crear el pirata correspondiente al jugador A o B respectivamente. Si la tecla presionada fue \texttt{y}, realiza lo mismo, \texttt{game_atender_teclado} se encargará de activar el modo debugger explicado en el ejercicio 7.
+\par \texttt{game_atender_teclado} llama a  \texttt{game_pirata_inicilizar}, pasando como parámetro el jugador correspondiente según la tecla que fue presionada. Si la pantalla de error del modo debugger está activa, la función no realiza nada (no queremos que se lancen piratas mientras se encuentra en pantalla la ventana de error).
+\par La función \texttt{game_pirata_inicilizar} se encarga de llamar a las funciones necesarias para iniciar una tarea pirata. Éstas son:
+\begin{itemize}
+\item \texttt{game_jugador_erigir_pirata}:    crea un struct pirata asociado al jugador, modificando las estructuras con la información del juego. (ver Apendice)
+\item  \texttt{mmu_inicializar_dir_pirata}: crea un directorio y tablas de página para la nueva tarea pirata. (ver ejercicio 4).
+\item  \texttt{tss_inicializar_tarea}: crea y completa la tabla tss de la tarea, y actualiza la gdt. (ver ejercicio 6).
+\texttt{screen_actualizar_reloj_pirata} y \texttt{screen_pintar_puerto}: actualizan la pantalla, activando el reloj del pirata y pintando la posición inicial en el mapa.
+\end{itemize}
+
+	\subsubsection*{Interrupción de sistema (0x46)}
+	
+\par \par La rutina asociada a los syscalls del sistena (_isr70 en isr.asm) se encarga de llamar a la rutina de atención de interrupciones de syscall \texttt{game_syscall_manejar} explicada en el ejercicio 6, y luego saltar a la tarea IDLE haciendo un \texttt{jmp 0x70:0}. (0x70 corresponde al índice del descriptor de segmento para la tss del idle en la gdt). 
+\par A diferencia de las rutinas de interrupciones de reloj y teclado, no preserva el registro EAX, ya que la función \texttt{game_syscall_manejar} lo utiliza para devolver la posición del jugador, en caso de que se llame a dicha interrupción.
+	

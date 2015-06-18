@@ -1,0 +1,51 @@
+\subsubsection*{Inicialización de la IDT}
+
+\par Para inicializar la IDT se llama a una funci\'on en lenguaje C, "void idt\_inicializar(void)". La IDT se representa mediante un arrelgo (de tama\~no 255) de "idt\_entry"
+(esta estructura fue definida como lo muestra el extracto de C\'odigo \ref{idtEntry}, seg\'un las especificaciones dadas en el manual de Intel). Esta funci\'on utiliza un macro
+(que se encuentra en el extracto de C\'odigo \ref{macro}) para inicializar cada una de las entradas necesarias de la IDT. 
+\par El macro define el offset como los 16 bits menos y m\'as significativos (ya que \'este se encuentra separado en dos campos de 16 bits cada uno) de la direcci\'on de la tarea de atenci\'on
+de la interrupci\'on correspondiente. El selector de segmento lo define como 0x0040, que es 0x8 (el indice del segmento de codigo de nivel de privilegio 0 en la GDT) shifteado 3 bits a la izquierda.
+Los atributos los define como 0x8e00, que representan un segmento presente (P = 1), un nivel de privilegio de 0 (DPL = 00), un tama\~no de Gate de 32 bits (bits 8 a 12 de la Interrupt Gate = 0b01110),
+y los 7 bits restantes en 0. 
+\par La rutina de atenci\'on de cada interrupci\'on se genera a partir de un macro (que se encuentra en el extracto de C\'odigo \ref{macroISR}) que imprime el c\'odigo de error correspondiente
+a pantalla y luego queda en un loop infinito.
+\par La IDT ya inicializada se puede acceder tras ejecutar la instrucci\'on $lidt [IDT\_DESC]$. El descriptor de la IDT, "IDT\_DESC" es una estructura (definida como se ve en el extracto de
+c\'odigo \ref{idtDesc}) que contiene el tama\~no de la IDT y su direcci\'on en memoria.
+
+\begin{lstlisting} [caption={Estructura de idt\_entry},label=idtEntry]
+typedef struct str_idt_entry_fld {
+    unsigned short offset_0_15;
+    unsigned short segsel;
+    unsigned short attr;
+    unsigned short offset_16_31;
+} __attribute__((__packed__, aligned (8))) idt_entry;
+
+\end{lstlisting}
+
+
+\begin{lstlisting} [caption={Codigo del macro utilizado para inicializar la IDT},label=macro]
+#define IDT_ENTRY(numero)                                                                                        
+    idt[numero].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## numero) & (unsigned int) 0xFFFF);        
+    idt[numero].segsel = (unsigned short) 0x0040;                                                                
+    idt[numero].attr = (unsigned short) 0x8e00;                                                                  
+    idt[numero].offset_16_31 = (unsigned short) ((unsigned int)(&_isr ## numero) >> 16 & (unsigned int) 0xFFFF);
+\end{lstlisting}
+
+\begin{lstlisting} [caption={Codigo del macro utilizado para la rutina de atencion de interrupciones},label=macroISR]
+_isr%1:
+    mov eax, %1
+    push dword 0x0f0f 
+    push dword 0
+    push dword 0
+    push MENSAJE_ERROR_%1
+    call print
+    
+    jmp \$
+\end{lstlisting}
+
+\begin{lstlisting} [caption={Estructura de IDT\_Desc}],label=idtDesc] 
+typedef struct str_idt_descriptor {
+    unsigned short  idt_length;
+    unsigned int    idt_addr;
+} __attribute__((__packed__)) idt_descriptor;
+\end{lstlisting}
