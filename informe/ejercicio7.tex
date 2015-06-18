@@ -43,4 +43,9 @@ Cuando nos llega una interrupción de las primeras 20, lo que hacemos es guardar
  
 En \texttt{game_pirata_exploto} (ademas de hacer las limpiezas de estructuras que correspondan) lo que hacemos es chequ si está el modo debug activado o no. En caso afirmativo, cargamos ciertas cosas que sean necesarias y llamamos a la función \texttt{screen_debug} que es realmente simple, muestra todos los datos en pantalla, mientras siga activado el modo debug. Cuando se vuelve a apretar 'y', el modo debug se desactiva y se sale de el loop, restaurando la pantalla como estaba (que previamente había sido backupeada).
  
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=100mm]{imagenes/scheduler.png}
+\caption{Funcionamiento del Scheduler}
+\end{figure}
 

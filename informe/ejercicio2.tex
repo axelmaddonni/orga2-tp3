@@ -9,10 +9,10 @@ Los atributos los define como 0x8e00, que representan un segmento presente (P = 
 y los 7 bits restantes en 0. 
 \par Cabe destacar la entrada de la IDT correspondiente a la interrupci\'on 0x46 (correspondiente a las \textit{syscalls}), que se inicializa de la forma detallada en el extracto de c\'odigo \ref{0x46}
 . La \'unica diferencia entre esta entrada y la definida por el macro previamente mencionado son los atributos, puntualmente el DPL (3 en esta entrada y 0 en las otras); esta diferencia se debe a que la \textit{syscall} debe poder ser llamada por las tareas, mientras que las otras interrupciones deben estar reservadas al nivel m\'as privilegiado.
-\par La rutina de atenci\'on de cada interrupci\'on se genera a partir de un macro (que se encuentra en el extracto de C\'odigo \ref{macroISR}) que imprime el c\'odigo de error correspondiente
+\par La rutina de atenci\'on de cada interrupci\'on se genera a partir de un macro (que se encuentra en el extracto de C\'odigo 5 que imprime el c\'odigo de error correspondiente
 a pantalla y luego queda en un loop infinito (esta rutina es un placeholder, que luego ser\'a reemplazada por una que mate a la tarea que causa la interrupci\'on y llame a la idle).
 \par La IDT ya inicializada se puede acceder tras ejecutar la instrucci\'on $lidt [IDT\_DESC]$. El descriptor de la IDT, "IDT\_DESC" es una estructura (definida como se ve en el extracto de
-c\'odigo \ref{idtDesc}) que contiene el tama\~no de la IDT y su direcci\'on en memoria.
+c\'odigo 6) que contiene el tama\~no de la IDT y su direcci\'on en memoria.
 
 \begin{lstlisting} [caption={Estructura de idt\_entry},label=idtEntry]
 typedef struct str_idt_entry_fld {
